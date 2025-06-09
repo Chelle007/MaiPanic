@@ -1,7 +1,7 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
-import { AlertTriangle, Copy, Home, Settings, Users } from 'lucide-react-native';
-import { View } from 'react-native';
+import { Copy, Home, Settings, Users } from 'lucide-react-native';
+import { View, Text } from 'react-native';
 
 import CirclesScreen from './screens/Circles';
 import HomeScreen from './screens/Home';
@@ -32,8 +32,8 @@ export default function App() {
               Home: <Home color={iconColor} size={size} />,
               Circles: <Copy color={iconColor} size={size} />,
               SOS: (
-                <View className="bg-red-600 w-12 h-12 rounded-full justify-center items-center">
-                  <AlertTriangle color="white" size={20} />
+                <View className="bg-red-600 w-14 h-14 mb-3 rounded-full justify-center items-center">
+                  <Text className="text-white font-semibold text-base">SOS</Text>
                 </View>
               ),
               Status: <Users color={iconColor} size={size} />,
