@@ -4,6 +4,8 @@ import {
     Battery,
     CheckCircle,
     ChevronRight,
+    ChevronDown,
+    ChevronUp,
     Clock,
     MapPin,
     MessageCircle,
@@ -23,7 +25,9 @@ import {
     TouchableOpacity,
     View,
     ImageBackground,
+    FlatList,
 } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface FamilyMember {
@@ -53,6 +57,7 @@ const StatusScreen = () => {
 
     const [currentTime, setCurrentTime] = useState(new Date());
     const [selectedCircleId, setSelectedCircleId] = useState(1);
+    const [showCircleSelector, setShowCircleSelector] = useState(false);
 
     // Sample family circles data
     const [familyCircles, setFamilyCircles] = useState<FamilyCircle[]>([
@@ -109,6 +114,48 @@ const StatusScreen = () => {
                     phone: "+65 9456 7890"
                 }
             ]
+        },
+        {
+            id: 2,
+            name: "Bestie Trio",
+            members: [
+                {
+                    id: 1,
+                    name: "Sarah (You)",
+                    avatar: "S",
+                    status: "safe",
+                    lastSeen: new Date(Date.now() - 5 * 60 * 1000),
+                    battery: 85,
+                    location: "Home",
+                    coordinates: { lat: 1.3521, lng: 103.9448 },
+                    isOnline: true,
+                    phone: "+65 9123 4567"
+                },
+                {
+                    id: 2,
+                    name: "James",
+                    avatar: "J",
+                    status: "help",
+                    lastSeen: new Date(Date.now() - 1 * 60 * 1000),
+                    battery: 30,
+                    location: "Park",
+                    coordinates: { lat: 1.3600, lng: 103.9300 },
+                    isOnline: true,
+                    phone: "+65 9000 2222"
+                },
+                {
+                    id: 3,
+                    name: "Lily",
+                    avatar: "L",
+                    status: "unknown",
+                    lastSeen: new Date(Date.now() - 25 * 60 * 1000),
+                    battery: 60,
+                    location: "Cafe",
+                    coordinates: { lat: 1.3550, lng: 103.9350 },
+                    isOnline: false,
+                    phone: "+65 9000 3333"
+                }
+            ]
         }
     ]);
 
@@ -121,6 +168,21 @@ const StatusScreen = () => {
 
         return () => clearInterval(timer);
     }, []);
+
+    const renderCircleSelector = () => (
+        <View className="flex-row items-center space-x-2">
+            <Text className="text-white">Circle:</Text>
+            <Picker
+                selectedValue={selectedCircleId}
+                onValueChange={(itemValue) => setSelectedCircleId(itemValue)}
+                style={{ width: 150, color: 'white', backgroundColor: '#374151' }} // Tailwind bg-gray-700
+            >
+                {familyCircles.map((circle) => (
+                    <Picker.Item key={circle.id} label={circle.name} value={circle.id} />
+                ))}
+            </Picker>
+        </View>
+    );
 
     const getStatusColor = (status: string) => {
         switch (status) {
@@ -497,22 +559,47 @@ const StatusScreen = () => {
     return (
         <SafeAreaView className="flex-1 bg-gray-900">
             {/* Header */}
-            <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-800">
+            <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-800 bg-gray-900 z-50">
                 <View className="flex-1">
                     <Text className="text-white text-xl font-bold">Family Circle</Text>
-                    <Text className="text-gray-400 text-sm">{currentCircle?.name}</Text>
+                    <TouchableOpacity onPress={() => setShowCircleSelector(true)}>
+                        <View className="flex-row items-center">
+                            <Text className="text-orange-400 text-sm font-semibold mr-1">{currentCircle?.name}</Text>
+                            <ChevronDown size={14} color="#F97316" />
+                        </View>
+                    </TouchableOpacity>
                 </View>
                 <View className="flex-row items-center">
                     <TouchableOpacity
                         onPress={() => setShowLostFoundModal(true)}
-                        className="p-2 ml-2"
+                        className={`flex-1 p-2 rounded-xl flex-row justify-center items-center ml-2 bg-red-500`}
                     >
-                        <AlertTriangle size={20} color="#9CA3AF" />
-                    </TouchableOpacity>
-                    <TouchableOpacity className="p-2 ml-2">
-                        <Settings size={20} color="#9CA3AF" />
+                        <AlertTriangle size={20} color="white" />
+                        <Text className="text-white font-semibold text-base ml-3">
+                            Report Loss
+                        </Text>
                     </TouchableOpacity>
                 </View>
+
+                {/* Dropdown Overlay */}
+                {showCircleSelector && (
+                    <View className="absolute top-full left-0 right-0 bg-gray-800 border border-gray-700 rounded-b-lg z-50">
+                        {familyCircles.map((circle) => (
+                            <TouchableOpacity
+                                key={circle.id}
+                                onPress={() => {
+                                    setSelectedCircleId(circle.id);
+                                    setShowCircleSelector(false);
+                                }}
+                                className="px-4 py-3 border-b border-gray-700"
+                            >
+                                <Text className={`text-white ${circle.id === selectedCircleId ? 'font-bold text-orange-400' : ''}`}>
+                                    {circle.name}
+                                </Text>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+                )}
             </View>
 
             {/* Main Content */}
