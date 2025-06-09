@@ -1,8 +1,19 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { Copy, Home, Settings, Users, X, AlertTriangle } from 'lucide-react-native';
-import { useState, useCallback } from 'react';
-import { Modal, Text, TouchableOpacity, View, Alert, StyleSheet, Dimensions, ViewStyle } from 'react-native';
+import { useState, useCallback, useRef } from 'react';
+import { 
+  Modal, 
+  Text, 
+  TouchableOpacity, 
+  View, 
+  Alert, 
+  StyleSheet, 
+  Dimensions, 
+  ViewStyle, 
+  PanResponder,
+  LayoutChangeEvent 
+} from 'react-native';
 
 import CirclesScreen from './screens/Circles';
 import HomeScreen from './screens/Home';
@@ -28,16 +39,57 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
   const [isSOSModalVisible, setIsSOSModalVisible] = useState(false);
   const [isSOSActive, setIsSOSActive] = useState(false);
 
-  const toggleSOS = useCallback(() => {
-    const newState = !isSOSActive;
-    setIsSOSActive(newState);
-    Alert.alert(
-      newState ? 'SOS Activated' : 'SOS Deactivated',
-      newState 
-        ? 'Emergency services and your emergency contacts have been notified.'
-        : 'SOS has been deactivated.'
-    );
-  }, [isSOSActive]);
+  const [sliderValue, setSliderValue] = useState(0);
+  const [isSliding, setIsSliding] = useState(false);
+  const [containerWidth, setContainerWidth] = useState(200);
+  const sliderContainerRef = useRef<View>(null);
+
+  const handleLayout = (event: LayoutChangeEvent) => {
+    setContainerWidth(event.nativeEvent.layout.width);
+  };
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderGrant: () => {
+        setIsSliding(true);
+      },
+      onPanResponderMove: (_, gestureState) => {
+        const newValue = Math.min(100, Math.max(0, (gestureState.moveX / containerWidth) * 100));
+        setSliderValue(newValue);
+      },
+      onPanResponderRelease: (_, gestureState) => {
+        const swipeDistance = gestureState.dx;
+        const isActivated = swipeDistance > containerWidth * 0.6; // Require 60% of the width
+        
+        if (isActivated && !isSOSActive) {
+          setIsSOSActive(true);
+          setSliderValue(100);
+          Alert.alert(
+            'SOS Activated',
+            'Emergency services and your emergency contacts have been notified.'
+          );
+        } else if (isSOSActive) {
+          // Reset if already active
+          setIsSOSActive(false);
+          setSliderValue(0);
+          Alert.alert(
+            'SOS Deactivated',
+            'SOS has been deactivated.'
+          );
+        } else {
+          // Reset if not activated
+          setSliderValue(0);
+        }
+        setIsSliding(false);
+      },
+      onPanResponderTerminate: () => {
+        setSliderValue(0);
+        setIsSliding(false);
+      }
+    })
+  ).current;
 
   const handleReportIncident = useCallback(() => {
     Alert.alert('Report Incident', 'Incident reporting functionality will be implemented here.');
@@ -147,24 +199,37 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
             </TouchableOpacity>
 
             <View style={styles.sosContainer}>
-              <View style={styles.sosButton}>
+              {/* <View style={styles.sosButton}>
                 <Text style={styles.sosText}>SOS</Text>
-              </View>
-              <TouchableOpacity 
-                style={styles.toggleContainer}
-                onPress={toggleSOS}
-                activeOpacity={0.8}
-              >
-                <View style={[
-                  styles.toggleTrack,
-                  isSOSActive && styles.toggleTrackActive
-                ]}>
-                  <View style={[
-                    styles.toggleThumb,
-                    isSOSActive && styles.toggleThumbActive
-                  ]} />
+              </View> */}
+              <View style={styles.sliderContainer}>
+                <View 
+                  style={styles.sliderTrack}
+                  onLayout={handleLayout}
+                  ref={sliderContainerRef}
+                  {...panResponder.panHandlers}
+                >
+                  <View style={styles.sliderFill} />
+                  <View 
+                    style={[
+                      styles.sliderKnob,
+                      {
+                        transform: [
+                          { translateX: Math.min(
+                            containerWidth - 50, 
+                            Math.max(0, (sliderValue / 100) * (containerWidth - 50))
+                          )}
+                        ]
+                      }
+                    ]}
+                  >
+                    <Text style={styles.sosIcon}>SOS</Text>
+                  </View>
+                  <Text style={styles.sliderLabel}>
+                    {isSOSActive ? 'Release to confirm' : 'Slide to activate SOS'}
+                  </Text>
                 </View>
-              </TouchableOpacity>
+              </View>
             </View>
           </View>
         </TouchableOpacity>
@@ -277,9 +342,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#374151',
-    borderRadius: 12,
-    padding: 12,
+    // backgroundColor: '#374151',
+    // borderRadius: 12,
+    // padding: 12,
   },
   sosButton: {
     backgroundColor: '#DC2626',
@@ -293,28 +358,64 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
   },
-  toggleContainer: {
-    marginLeft: 'auto',
-  },
-  toggleTrack: {
-    width: 50,
-    height: 28,
-    borderRadius: 20,
-    backgroundColor: '#6B7280',
-    padding: 2,
+  sliderContainer: {
+    flex: 1,
+    // marginLeft: 12,
+    height: 64,
     justifyContent: 'center',
   },
-  toggleTrackActive: {
-    backgroundColor: '#DC2626',
+  sliderLabel: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+  
+    color: '#E5E7EB',
+    fontSize: 17,
+    fontFamily: 'System',
+    fontWeight: '500',
+    textAlign: 'center',
+    zIndex: 1,
+  },  
+  sliderTrack: {
+    height: 50,
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    borderRadius: 27,
+    position: 'relative',
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
-  toggleThumb: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+  sliderFill: {
+    position: 'absolute',
+    height: '100%',
+    backgroundColor: 'rgba(239, 68, 68, 0.3)',
+    borderRadius: 27,
+    width: '100%',
+  },
+  sliderKnob: {
+    position: 'absolute',
+    width: 42,
+    height: 42,
+    borderRadius: 21,
     backgroundColor: 'white',
-    transform: [{ translateX: 0 }],
+    left: 4,
+    top: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
+    elevation: 3,
+    zIndex: 2,
   },
-  toggleThumbActive: {
-    transform: [{ translateX: 22 }],
-  },
+  sosIcon: {
+    color: '#EF4444',
+    fontWeight: '800',
+    fontSize: 16,
+  }
 });
