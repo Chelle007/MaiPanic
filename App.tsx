@@ -9,7 +9,6 @@ import SettingsScreen from './screens/Settings';
 import SOSScreen from './screens/SOS';
 import StatusScreen from './screens/Status';
 
-
 import './global.css';
 
 const Tab = createBottomTabNavigator();
