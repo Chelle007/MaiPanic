@@ -22,6 +22,7 @@ import {
     Text,
     TouchableOpacity,
     View,
+    ImageBackground,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -45,6 +46,7 @@ interface FamilyCircle {
 }
 
 const StatusScreen = () => {
+    const MAP_IMAGE = require('../assets/map.png');
     const [selectedMember, setSelectedMember] = useState<FamilyMember | null>(null);
     const [showEmergencyNudgeModal, setShowEmergencyNudgeModal] = useState(false);
     const [showLostFoundModal, setShowLostFoundModal] = useState(false); const [nudgeInterval, setNudgeInterval] = useState<ReturnType<typeof setInterval> | null>(null);
@@ -196,15 +198,19 @@ const StatusScreen = () => {
     };
 
     const renderMap = () => (
-        <View className="h-64 bg-gray-700 rounded-xl overflow-hidden mb-6">
-            <View className="flex-1 bg-gray-800 relative">
+        <View className="h-64 rounded-xl overflow-hidden mb-6">
+            <ImageBackground
+                source={MAP_IMAGE}
+                resizeMode="cover"
+                className="flex-1 relative"
+            >
                 {currentCircle?.members.map((member, index) => (
                     <TouchableOpacity
                         key={member.id}
                         className="absolute"
                         style={{
-                            top: `${30 + index * 20}%`,
-                            left: `${20 + index * 25}%`,
+                            top: `${20 + index * 20}%`,
+                            left: `${10 + index * 25}%`,
                         }}
                         onPress={() => setSelectedMember(member)}
                     >
@@ -238,7 +244,7 @@ const StatusScreen = () => {
                         <Text className="text-white text-xs">Need Help</Text>
                     </View>
                 </View>
-            </View>
+            </ImageBackground>
         </View>
     );
 
