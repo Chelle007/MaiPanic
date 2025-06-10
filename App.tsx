@@ -2,12 +2,16 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { AlertTriangle, Copy, Home, Settings, Users } from 'lucide-react-native';
 import { View } from 'react-native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import CirclesScreen from './screens/Circles';
 import HomeScreen from './screens/Home';
 import SettingsScreen from './screens/Settings';
 import SOSScreen from './screens/SOS';
 import StatusScreen from './screens/Status';
+
+//For homepage screens
+import BombSheltersScreen from './screens/Bombshelters';
 
 
 import './global.css';
@@ -53,4 +57,16 @@ export default function App() {
       </Tab.Navigator>
     </NavigationContainer>
   );
+}
+
+//Root app with stack navigation
+export default function App() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="MainTabs" component={TabNavigator} />
+        <Stack.Screen name="BombShelters" component={BombSheltersScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  )
 }
