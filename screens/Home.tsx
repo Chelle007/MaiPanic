@@ -53,8 +53,8 @@ const HomeScreen = () => {
       </TouchableOpacity> */}
 
       {/* OVERLAY CARD */}
-      <View className="absolute bottom-0 inset-x-0 px-4">
-        <View className="bg-gray-900 rounded-t-2xl pt-10 pb-20 px-20 flex-row justify-between items-center">
+      <View className="absolute bottom-0 inset-x-0 ">
+        <View className="w-full max-w-xl bg-gray-900 rounded-t-2xl pt-10 pb-20 px-20 flex-row justify-between items-center">
           {/* Bomb Shelters Button */}
           <TouchableOpacity className="items-center">
             <Image
