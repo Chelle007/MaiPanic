@@ -68,10 +68,10 @@ export default function SOSModal({ visible, onClose }: SOSModalProps) {
       >
         <View
           onStartShouldSetResponder={() => true}
-          className="w-full max-w-lg bg-gray-900 rounded-2xl p-6 shadow-lg"
+          className="w-full max-w-lg bg-gray-900 rounded-2xl p-6 pt-3 shadow-lg"
         >
           {/* Header */}
-          <View className="flex-row justify-end mb-6">
+          <View className="flex-row justify-end mb-1">
             <TouchableOpacity onPress={onClose} className="p-2">
               <X size={24} color="#9CA3AF" />
             </TouchableOpacity>
@@ -81,7 +81,7 @@ export default function SOSModal({ visible, onClose }: SOSModalProps) {
           <TouchableOpacity
             onPress={handleReportIncident}
             activeOpacity={0.8}
-            className="flex-row items-center bg-orange-500 rounded-xl px-5 py-4 mb-6"
+            className="flex-row items-center justify-center bg-orange-500 rounded-xl px-5 py-4 mb-6"
           >
             <AlertTriangle size={24} color="white" />
             <Text className="text-white font-semibold text-lg ml-4">Report Incident</Text>
@@ -102,12 +102,12 @@ export default function SOSModal({ visible, onClose }: SOSModalProps) {
 
               {/* Draggable knob */}
               <View
-                className="absolute top-1.5 w-12 h-12 rounded-full bg-white justify-center items-center shadow-lg"
+                className="absolute w-12 h-12 rounded-full bg-red-500 justify-center items-center shadow-lg z-50 top-1/2 -translate-y-1/2"
                 style={{
                   left: Math.min(containerWidth - 48, (sliderValue / 100) * (containerWidth - 48)),
                 }}
               >
-                <Text className="text-red-600 font-extrabold text-lg">SOS</Text>
+                <Text className="text-white font-extrabold text-lg">SOS</Text>
               </View>
 
               {/* Center label */}
