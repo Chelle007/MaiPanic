@@ -2,9 +2,11 @@ import React, { useRef } from 'react';
 import { View, StyleSheet, TouchableOpacity, Text, Image } from 'react-native';
 import MapView, { Region } from 'react-native-maps';
 import type { MapView as MapViewType } from 'react-native-maps';
+import { useNavigation } from '@react-navigation/native';
 
 const HomeScreen = () => {
   const mapRef = useRef<MapViewType | null>(null);
+  const navigation = useNavigation();
 
   const handleRecenter = () => {
     const singaporeRegion: Region = {
@@ -56,7 +58,7 @@ const HomeScreen = () => {
       <View className="absolute bottom-0 inset-x-0 ">
         <View className="w-full max-w-xl bg-gray-900 rounded-t-2xl pt-10 pb-20 px-20 flex-row justify-between items-center">
           {/* Bomb Shelters Button */}
-          <TouchableOpacity className="items-center">
+          <TouchableOpacity className="items-center" onPress={() => navigation.navigate('BombShelters')}>
             <Image
               source={require('../assets/bombshelter.png')}
               style={{ width: 60, height: 60, resizeMode: 'contain' }}
