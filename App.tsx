@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createStackNavigator } from '@react-navigation/stack';
-import { useNavigation } from '@react-navigation/native';
 import type { NavigationHelpers, ParamListBase } from '@react-navigation/native';
 import type { BottomTabNavigationEventMap } from '@react-navigation/bottom-tabs';
 import { Home, Copy, Users, Settings } from 'lucide-react-native';
@@ -18,7 +16,6 @@ import ReportScreen from './screens/Report'; // Add your Report screen import
 import './global.css'
 
 const Tab = createBottomTabNavigator();
-const Stack = createStackNavigator();
 
 // Create a wrapper component for the Tab Navigator
 function MainTabNavigator() {
