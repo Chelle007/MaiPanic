@@ -1,13 +1,22 @@
 import React, { useState, useRef } from 'react';
-import { Modal, View, Text, TouchableOpacity, Alert, PanResponder, LayoutChangeEvent } from 'react-native';
+import {
+  Modal,
+  View,
+  Text,
+  TouchableOpacity,
+  Alert,
+  PanResponder,
+  LayoutChangeEvent,
+} from 'react-native';
 import { X, AlertTriangle } from 'lucide-react-native';
 
 type SOSModalProps = {
   visible: boolean;
   onClose: () => void;
+  navigation: any; // You can type this better with RootStackParamList if you like later
 };
 
-export default function SOSModal({ visible, onClose }: SOSModalProps) {
+export default function SOSModal({ visible, onClose, navigation }: SOSModalProps) {
   const [sliderValue, setSliderValue] = useState(0);
   const [isSOSActive, setIsSOSActive] = useState(false);
   const [containerWidth, setContainerWidth] = useState(200);
@@ -56,7 +65,8 @@ export default function SOSModal({ visible, onClose }: SOSModalProps) {
   ).current;
 
   const handleReportIncident = () => {
-    Alert.alert('Report Incident', 'Incident reporting functionality will be implemented here.');
+    onClose(); // Close the modal first
+    navigation.navigate('Report'); // Then navigate to Report screen
   };
 
   return (
