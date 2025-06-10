@@ -1,8 +1,7 @@
 import React, { useRef } from 'react';
-import { View, StyleSheet, TouchableOpacity, Text , Image} from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text, Image } from 'react-native';
 import MapView, { Region } from 'react-native-maps';
-import type {  MapView as MapViewType } from 'react-native-maps';
-
+import type { MapView as MapViewType } from 'react-native-maps';
 
 const HomeScreen = () => {
   const mapRef = useRef<MapViewType | null>(null);
@@ -17,12 +16,12 @@ const HomeScreen = () => {
 
     mapRef.current?.animateToRegion(singaporeRegion, 1000);
   };
+
   return (
     <View className="flex-1">
       {/* MAP */}
       <MapView
         ref={mapRef}
-        //provider={PROVIDER_GOOGLE}
         style={StyleSheet.absoluteFillObject}
         initialRegion={{
           latitude: 1.3521,
@@ -34,28 +33,35 @@ const HomeScreen = () => {
         showsMyLocationButton={false}
       />
 
-      {/* CUSTOM LOCATION BUTTON - floating on map, above overlay */}
-      <TouchableOpacity
+      {/* CUSTOM LOCATION BUTTON - above the overlay card */}
+      {/* <TouchableOpacity
         onPress={handleRecenter}
-        className="absolute right-5 bottom-40 bg-gray-800 p-3 rounded-full shadow-lg"
-        style={{ zIndex: 10 }}
+        className="absolute right-5"
+        style={{
+          bottom: 120, // Adjust this to sit *above* the overlay card
+          backgroundColor: '#1f2937',
+          padding: 12,
+          borderRadius: 999,
+          zIndex: 20,
+          elevation: 5,
+        }}
       >
         <Image
           source={require('../assets/myLocation.png')}
           style={{ width: 24, height: 24, tintColor: 'white' }}
         />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
 
       {/* OVERLAY CARD */}
       <View className="absolute bottom-0 inset-x-0 px-4">
-        <View className="bg-gray-900 rounded-t-2xl pt-10 pb-20 px-20 flex-row  justify-between items-center">
+        <View className="bg-gray-900 rounded-t-2xl pt-10 pb-20 px-20 flex-row justify-between items-center">
           {/* Bomb Shelters Button */}
           <TouchableOpacity className="items-center">
             <Image
-                source={require('../assets/bombshelter.png')} 
-                style={{ width: 60, height: 60, resizeMode: 'contain' }}
-              />
-              <Text className="text-white mt-1">Bomb Shelters</Text>
+              source={require('../assets/bombshelter.png')}
+              style={{ width: 60, height: 60, resizeMode: 'contain' }}
+            />
+            <Text className="text-white mt-1">Bomb Shelters</Text>
           </TouchableOpacity>
 
           {/* Recents Button */}
