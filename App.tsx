@@ -37,53 +37,55 @@ function MainTabNavigator() {
 
           return (
             <View className="flex-row h-20 bg-gray-900 border-t border-gray-700 px-4 justify-between items-center">
-              {state.routes.map((route, index) => {
-                const isFocused = state.index === index;
-                const iconColor = isFocused ? '#F97316' : '#9CA3AF';
-                const size = 28;
+              {state.routes
+                .filter(route => route.name !== 'Report') // Filter out the hidden Report screen
+                .map((route, index) => {
+                  const isFocused = state.index === index;
+                  const iconColor = isFocused ? '#F97316' : '#9CA3AF';
+                  const size = 28;
 
-                const onPress = () => {
-                  if (route.name === 'SOS') {
-                    setIsSOSModalVisible(true);
-                    return;
+                  const onPress = () => {
+                    if (route.name === 'SOS') {
+                      setIsSOSModalVisible(true);
+                      return;
+                    }
+                    navigation.navigate(route.name);
+                  };
+
+                  let icon = null;
+                  switch (route.name) {
+                    case 'Home':
+                      icon = <Home color={iconColor} size={size} />;
+                      break;
+                    case 'Circles':
+                      icon = <Copy color={iconColor} size={size} />;
+                      break;
+                    case 'Status':
+                      icon = <Users color={iconColor} size={size} />;
+                      break;
+                    case 'Settings':
+                      icon = <Settings color={iconColor} size={size} />;
+                      break;
+                    case 'SOS':
+                      icon = (
+                        <View className="bg-red-600 w-16 h-16 rounded-full justify-center items-center shadow-lg -mt-8">
+                          <Text className="text-white font-bold text-lg">SOS</Text>
+                        </View>
+                      );
+                      break;
                   }
-                  navigation.navigate(route.name);
-                };
 
-                let icon = null;
-                switch (route.name) {
-                  case 'Home':
-                    icon = <Home color={iconColor} size={size} />;
-                    break;
-                  case 'Circles':
-                    icon = <Copy color={iconColor} size={size} />;
-                    break;
-                  case 'Status':
-                    icon = <Users color={iconColor} size={size} />;
-                    break;
-                  case 'Settings':
-                    icon = <Settings color={iconColor} size={size} />;
-                    break;
-                  case 'SOS':
-                    icon = (
-                      <View className="bg-red-600 w-16 h-16 rounded-full justify-center items-center shadow-lg -mt-8">
-                        <Text className="text-white font-bold text-lg">SOS</Text>
-                      </View>
-                    );
-                    break;
-                }
-
-                return (
-                  <TouchableOpacity
-                    key={route.key}
-                    onPress={onPress}
-                    className="flex-1 items-center justify-center"
-                    activeOpacity={0.8}
-                  >
-                    {icon}
-                  </TouchableOpacity>
-                );
-              })}
+                  return (
+                    <TouchableOpacity
+                      key={route.key}
+                      onPress={onPress}
+                      className="flex-1 items-center justify-center"
+                      activeOpacity={0.8}
+                    >
+                      {icon}
+                    </TouchableOpacity>
+                  );
+                })}
             </View>
           );
         }}
