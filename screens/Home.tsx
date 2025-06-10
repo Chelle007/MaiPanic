@@ -1,8 +1,48 @@
 import React, { useRef } from 'react';
 import { View, StyleSheet, TouchableOpacity, Text, Image } from 'react-native';
-import MapView, { Region } from 'react-native-maps';
+import MapView, { Marker, Region } from 'react-native-maps';
 import type { MapView as MapViewType } from 'react-native-maps';
 import { useNavigation } from '@react-navigation/native';
+
+
+//example of bomshelters coordinates
+const shelterData = [
+  {
+    id: '1',
+    name: 'Bishan MRT Station',
+    latitude: 1.3510,
+    longitude: 103.8480,
+    distance: '0.2 km'
+  },
+  {
+    id: '2',
+    name: 'Ang Mo Kio MRT Station',
+    latitude: 1.3690,
+    longitude: 103.8454,
+    distance: '2.5 km'
+  },
+  {
+    id: '3',
+    name: 'Toa Payoh MRT Station',
+    latitude: 1.3323,
+    longitude: 103.8474,
+    distance: '4.0 km'
+  },
+  {
+    id: '4',
+    name: 'Novena MRT Station',
+    latitude: 1.3202,
+    longitude: 103.8430,
+    distance: '6.0 km'
+  },
+  {
+    id: '5',
+    name: 'City Hall MRT Station',
+    latitude: 1.2930,
+    longitude: 103.8520,
+    distance: '7.0 km'
+  },
+];
 
 const HomeScreen = () => {
   const mapRef = useRef<MapViewType | null>(null);
@@ -19,6 +59,11 @@ const HomeScreen = () => {
     mapRef.current?.animateToRegion(singaporeRegion, 1000);
   };
 
+  const handleMarkerPress = (shelter: typeof shelterData[0]) => {
+    //add navigation or show more details here
+    console.log(`Selected Shelter: ${shelter.name}`);
+  }
+
   return (
     <View className="flex-1">
       {/* MAP */}
@@ -33,7 +78,21 @@ const HomeScreen = () => {
         }}
         showsUserLocation={true}
         showsMyLocationButton={false}
-      />
+      >
+        {shelterData.map((shelter) => (
+          <Marker
+            key={shelter.id}
+            coordinate={{
+              latitude: shelter.latitude,
+              longitude: shelter.longitude,
+            }}
+            image={require('../assets/bombshelter.png')}
+            title={shelter.name}
+            description='Bomb Shelter'
+            />
+        ))}
+      </MapView>
+
 
       {/* CUSTOM LOCATION BUTTON - above the overlay card */}
       {/* <TouchableOpacity
