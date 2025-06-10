@@ -6,17 +6,65 @@ import {
   FlatList,
   TouchableOpacity,
   Image,
+  Linking,
+  Platform,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { ChevronLeft } from 'lucide-react-native';
 
 const shelters = [
-  { id: '1', name: 'Bishan MRT Station', distance: '0.2 km' },
-  { id: '2', name: 'Ang Mo Kio MRT Station', distance: '2.5 km' },
-  { id: '3', name: 'Toa Payoh MRT Station', distance: '4.0 km' },
-  { id: '4', name: 'Novena MRT Station', distance: '6.0 km' },
-  { id: '5', name: 'City Hall MRT Station', distance: '7.0 km' },
+  {
+    id: '1',
+    name: 'Bishan MRT Station',
+    latitude: 1.3510,
+    longitude: 103.8480,
+    distance: '0.2 km'
+  },
+  {
+    id: '2',
+    name: 'Ang Mo Kio MRT Station',
+    latitude: 1.3690,
+    longitude: 103.8454,
+    distance: '2.5 km'
+  },
+  {
+    id: '3',
+    name: 'Toa Payoh MRT Station',
+    latitude: 1.3323,
+    longitude: 103.8474,
+    distance: '4.0 km'
+  },
+  {
+    id: '4',
+    name: 'Novena MRT Station',
+    latitude: 1.3202,
+    longitude: 103.8430,
+    distance: '6.0 km'
+  },
+  {
+    id: '5',
+    name: 'City Hall MRT Station',
+    latitude: 1.2930,
+    longitude: 103.8520,
+    distance: '7.0 km'
+  },
 ];
+
+//this code will add a function to open directions
+const openDirections = (latitude: number, longitude: number, label: string) => {
+  const scheme = Platform.select({
+    ios: 'maps://0,0?q=',
+    android: 'geo:0,0?q=',
+  });
+
+  const latLng = `${latitude},${longitude}`;
+  const url = Platform.select({
+    ios: `${scheme}${label}@${latLng}`,
+    android: `${scheme}${latLng}(${label})`,
+  });
+
+  Linking.openURL(url ?? '');
+};
 
 const BombSheltersScreen = () => {
   const navigation = useNavigation();
@@ -57,7 +105,14 @@ const BombSheltersScreen = () => {
         data={filteredShelters}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <TouchableOpacity className="bg-gray-800 rounded-xl px-4 py-3 mb-3 flex-row justify-between items-center">
+          <TouchableOpacity
+            className="bg-gray-800 rounded-xl px-4 py-3 mb-3 flex-row justify-between items-center"
+            onPress={() => openDirections(
+              item.latitude ?? 1.3521, // fallback to default if missing
+              item.longitude ?? 103.8198,
+              item.name
+            )}
+          >
             <View className="flex-row items-center">
               <Image
                 source={require('../assets/bombshelter.png')}
