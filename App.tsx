@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Home, Copy, Users, Settings } from 'lucide-react-native';
 import { TouchableOpacity, View, Text } from 'react-native';
 
@@ -11,10 +12,12 @@ import StatusScreen from './screens/Status';
 import SettingsScreen from './screens/Settings';
 import SOSScreen from './screens/SOS';
 import ReportScreen from './screens/Report';
+import BombSheltersScreen from './screens/BombShelters';
 
 import './global.css'
 
 const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
 
 // Create a wrapper component for the Tab Navigator
 function MainTabNavigator() {
@@ -120,10 +123,14 @@ function MainTabNavigator() {
   );
 }
 
+// Main App component with Stack Navigator
 export default function App() {
   return (
     <NavigationContainer>
-      <MainTabNavigator />
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="MainTabs" component={MainTabNavigator} />
+        <Stack.Screen name="BombShelters" component={BombSheltersScreen} />
+      </Stack.Navigator>
     </NavigationContainer>
   );
 }
