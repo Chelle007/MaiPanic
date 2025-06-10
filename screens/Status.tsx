@@ -16,7 +16,7 @@ import {
     X,
     XCircle
 } from 'lucide-react-native';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import {
     Alert,
     Modal,
@@ -25,7 +25,7 @@ import {
     TouchableOpacity,
     View,
     ImageBackground,
-    FlatList,
+    Animated,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -51,6 +51,9 @@ interface FamilyCircle {
 
 const StatusScreen = () => {
     const MAP_IMAGE = require('../assets/map.png');
+    const fadeAnim = useRef(new Animated.Value(0)).current;
+    const slideAnim = useRef(new Animated.Value(300)).current; // Start off-screen
+
     const [selectedMember, setSelectedMember] = useState<FamilyMember | null>(null);
     const [showEmergencyNudgeModal, setShowEmergencyNudgeModal] = useState(false);
     const [showLostFoundModal, setShowLostFoundModal] = useState(false); const [nudgeInterval, setNudgeInterval] = useState<ReturnType<typeof setInterval> | null>(null);
@@ -166,8 +169,42 @@ const StatusScreen = () => {
             setCurrentTime(new Date());
         }, 60000);
 
+        if (selectedMember) {
+            // Reset to starting state first
+            fadeAnim.setValue(0);
+            slideAnim.setValue(500);
+
+            // Then animate in
+            Animated.parallel([
+                Animated.timing(fadeAnim, {
+                    toValue: 1,
+                    duration: 300,
+                    useNativeDriver: true,
+                }),
+                Animated.timing(slideAnim, {
+                    toValue: 0,
+                    duration: 300,
+                    useNativeDriver: true,
+                }),
+            ]).start();
+        } else {
+            // Animate out (optional)
+            Animated.parallel([
+                Animated.timing(fadeAnim, {
+                    toValue: 0,
+                    duration: 200,
+                    useNativeDriver: true,
+                }),
+                Animated.timing(slideAnim, {
+                    toValue: 500,
+                    duration: 200,
+                    useNativeDriver: true,
+                }),
+            ]).start();
+        }
+
         return () => clearInterval(timer);
-    }, []);
+    }, [selectedMember]);
 
     const renderCircleSelector = () => (
         <View className="flex-row items-center space-x-2">
@@ -385,89 +422,108 @@ const StatusScreen = () => {
     const renderMemberDetail = () => (
         <Modal
             visible={selectedMember !== null}
-            animationType="slide"
+            animationType="none"
             transparent={true}
         >
-            <View className="flex-1 bg-black/75 justify-end">
-                <View className="bg-gray-900 rounded-t-2xl px-4 pt-4 max-h-4/5">
-                    <View className="flex-row justify-between items-center mb-4">
-                        <Text className="text-white text-xl font-bold">{selectedMember?.name}</Text>
-                        <TouchableOpacity
-                            onPress={() => setSelectedMember(null)}
-                            className="p-1"
-                        >
-                            <X size={24} color="#9CA3AF" />
-                        </TouchableOpacity>
+            <Animated.View
+                style={{
+                    flex: 1,
+                    backgroundColor: 'rgba(0,0,0,0.75)',
+                    opacity: fadeAnim,
+                    justifyContent: 'flex-end',
+                }}
+            >
+                <Animated.View
+                    style={{
+                        transform: [{ translateY: slideAnim }],
+                        backgroundColor: 'rgb(17 24 39)',
+                        borderTopLeftRadius: 24,
+                        borderTopRightRadius: 24,
+                        paddingHorizontal: 16,
+                        paddingTop: 16,
+                        maxHeight: '80%',
+                    }}
+                >
+                    <View className="bg-gray-900 rounded-t-2xl px-4 pt-4 max-h-4/5">
+                        <View className="flex-row justify-between items-center mb-4">
+                            <Text className="text-white text-xl font-bold">{selectedMember?.name}</Text>
+                            <TouchableOpacity
+                                onPress={() => setSelectedMember(null)}
+                                className="p-1"
+                            >
+                                <X size={24} color="#9CA3AF" />
+                            </TouchableOpacity>
+                        </View>
+
+                        <ScrollView className="flex-1">
+                            <View className="bg-gray-800 rounded-xl p-4 mb-4">
+                                <View className="flex-row justify-between items-center">
+                                    <Text className="text-gray-400 text-sm">Status</Text>
+                                    <View className="flex-row items-center">
+                                        <View
+                                            className={`w-3 h-3 rounded-full mr-2 ${getStatusColor(selectedMember?.status || '')}`}
+                                        />
+                                        <Text className="text-white text-sm font-semibold">
+                                            {selectedMember?.status ?
+                                                selectedMember.status.charAt(0).toUpperCase() + selectedMember.status.slice(1) :
+                                                ''
+                                            }
+                                        </Text>
+                                    </View>
+                                </View>
+                            </View>
+
+                            <View className="flex-row mb-4">
+                                <View className="bg-gray-800 rounded-xl p-4 flex-1 mr-2">
+                                    <View className="flex-row items-center mb-2">
+                                        <MapPin size={16} color="#F97316" />
+                                        <Text className="text-gray-400 text-xs ml-2">Location</Text>
+                                    </View>
+                                    <Text className="text-white text-base font-semibold">{selectedMember?.location}</Text>
+                                </View>
+
+                                <View className="bg-gray-800 rounded-xl p-4 flex-1 ml-2">
+                                    <View className="flex-row items-center mb-2">
+                                        <Battery size={16} color={selectedMember?.battery && selectedMember.battery > 50 ? '#10B981' : selectedMember?.battery && selectedMember.battery > 20 ? '#F59E0B' : '#EF4444'} />
+                                        <Text className="text-gray-400 text-xs ml-2">Battery</Text>
+                                    </View>
+                                    <Text className="text-white text-base font-semibold">{selectedMember?.battery}%</Text>
+                                </View>
+                            </View>
+
+                            <View className="bg-gray-800 rounded-xl p-4 mb-4">
+                                <View className="flex-row items-center mb-2">
+                                    <Clock size={16} color="#F97316" />
+                                    <Text className="text-gray-400 text-xs ml-2">Last Seen</Text>
+                                </View>
+                                <Text className="text-white text-base font-semibold">{formatTimeAgo(selectedMember?.lastSeen || new Date())}</Text>
+                            </View>
+
+                            {!selectedMember?.name.includes('You') && (
+                                <View className="mt-4 mb-4">
+                                    <TouchableOpacity
+                                        onPress={() => handleNudgeMember(selectedMember?.id || 0)}
+                                        className="bg-orange-500 py-3 rounded-xl mb-3"
+                                    >
+                                        <Text className="text-white text-base font-semibold text-center">Send Check-In Nudge</Text>
+                                    </TouchableOpacity>
+
+                                    <View className="flex-row">
+                                        <TouchableOpacity className="bg-gray-800 py-3 px-4 rounded-xl flex-1 flex-row justify-center items-center mr-2">
+                                            <Phone size={16} color="white" />
+                                            <Text className="text-white text-sm font-semibold ml-2">Call</Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity className="bg-gray-800 py-3 px-4 rounded-xl flex-1 flex-row justify-center items-center ml-2">
+                                            <MessageCircle size={16} color="white" />
+                                            <Text className="text-white text-sm font-semibold ml-2">Message</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
+                            )}
+                        </ScrollView>
                     </View>
-
-                    <ScrollView className="flex-1">
-                        <View className="bg-gray-800 rounded-xl p-4 mb-4">
-                            <View className="flex-row justify-between items-center">
-                                <Text className="text-gray-400 text-sm">Status</Text>
-                                <View className="flex-row items-center">
-                                    <View
-                                        className={`w-3 h-3 rounded-full mr-2 ${getStatusColor(selectedMember?.status || '')}`}
-                                    />
-                                    <Text className="text-white text-sm font-semibold">
-                                        {selectedMember?.status ?
-                                            selectedMember.status.charAt(0).toUpperCase() + selectedMember.status.slice(1) :
-                                            ''
-                                        }
-                                    </Text>
-                                </View>
-                            </View>
-                        </View>
-
-                        <View className="flex-row mb-4">
-                            <View className="bg-gray-800 rounded-xl p-4 flex-1 mr-2">
-                                <View className="flex-row items-center mb-2">
-                                    <MapPin size={16} color="#F97316" />
-                                    <Text className="text-gray-400 text-xs ml-2">Location</Text>
-                                </View>
-                                <Text className="text-white text-base font-semibold">{selectedMember?.location}</Text>
-                            </View>
-
-                            <View className="bg-gray-800 rounded-xl p-4 flex-1 ml-2">
-                                <View className="flex-row items-center mb-2">
-                                    <Battery size={16} color={selectedMember?.battery && selectedMember.battery > 50 ? '#10B981' : selectedMember?.battery && selectedMember.battery > 20 ? '#F59E0B' : '#EF4444'} />
-                                    <Text className="text-gray-400 text-xs ml-2">Battery</Text>
-                                </View>
-                                <Text className="text-white text-base font-semibold">{selectedMember?.battery}%</Text>
-                            </View>
-                        </View>
-
-                        <View className="bg-gray-800 rounded-xl p-4 mb-4">
-                            <View className="flex-row items-center mb-2">
-                                <Clock size={16} color="#F97316" />
-                                <Text className="text-gray-400 text-xs ml-2">Last Seen</Text>
-                            </View>
-                            <Text className="text-white text-base font-semibold">{formatTimeAgo(selectedMember?.lastSeen || new Date())}</Text>
-                        </View>
-
-                        {!selectedMember?.name.includes('You') && (
-                            <View className="mt-4 mb-4">
-                                <TouchableOpacity
-                                    onPress={() => handleNudgeMember(selectedMember?.id || 0)}
-                                    className="bg-orange-500 py-3 rounded-xl mb-3"
-                                >
-                                    <Text className="text-white text-base font-semibold text-center">Send Check-In Nudge</Text>
-                                </TouchableOpacity>
-
-                                <View className="flex-row">
-                                    <TouchableOpacity className="bg-gray-800 py-3 px-4 rounded-xl flex-1 flex-row justify-center items-center mr-2">
-                                        <Phone size={16} color="white" />
-                                        <Text className="text-white text-sm font-semibold ml-2">Call</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity className="bg-gray-800 py-3 px-4 rounded-xl flex-1 flex-row justify-center items-center ml-2">
-                                        <MessageCircle size={16} color="white" />
-                                        <Text className="text-white text-sm font-semibold ml-2">Message</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-                        )}
-                    </ScrollView>
-                </View>
-            </View>
+                </Animated.View>
+            </Animated.View>
         </Modal>
     );
 
