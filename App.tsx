@@ -1,8 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import type { NavigationHelpers, ParamListBase } from '@react-navigation/native';
-import type { BottomTabNavigationEventMap } from '@react-navigation/bottom-tabs';
 import { Home, Copy, Users, Settings } from 'lucide-react-native';
 import { TouchableOpacity, View, Text } from 'react-native';
 
@@ -11,6 +9,7 @@ import HomeScreen from './screens/Home';
 import CirclesScreen from './screens/Circles';
 import StatusScreen from './screens/Status';
 import SettingsScreen from './screens/Settings';
+import SOSScreen from './screens/SOS';
 import ReportScreen from './screens/Report';
 
 import './global.css'
@@ -20,18 +19,29 @@ const Tab = createBottomTabNavigator();
 // Create a wrapper component for the Tab Navigator
 function MainTabNavigator() {
   const [isSOSModalVisible, setIsSOSModalVisible] = useState(false);
-  const [tabNavigation, setTabNavigation] = useState<NavigationHelpers<ParamListBase, BottomTabNavigationEventMap> | null>(null);
+  const tabNavigationRef = useRef<any>(null);
+
+  // Function to handle navigation from modal
+  const handleNavigateFromModal = (screenName: string) => {
+    setIsSOSModalVisible(false);
+
+    // Use a more immediate approach
+    if (tabNavigationRef.current) {
+      tabNavigationRef.current.navigate(screenName);
+    } else {
+      setTimeout(() => {
+        tabNavigationRef.current.navigate(screenName);
+      }, 100);
+    }
+  };
 
   return (
     <>
       <Tab.Navigator
         screenOptions={{ headerShown: false }}
         tabBar={({ state, descriptors, navigation }) => {
-          // Store navigation reference
-          if (!tabNavigation) {
-            setTabNavigation(navigation);
-          }
-
+          // Capture the navigation object in ref
+          tabNavigationRef.current = navigation;
           return (
             <View className="flex-row h-20 bg-gray-900 border-t border-gray-700 px-4 justify-between items-center">
               {state.routes
@@ -89,13 +99,7 @@ function MainTabNavigator() {
       >
         <Tab.Screen name="Home" component={HomeScreen} />
         <Tab.Screen name="Circles" component={CirclesScreen} />
-        <Tab.Screen
-          name="SOS"
-          component={HomeScreen}
-          listeners={{
-            tabPress: (e) => e.preventDefault(), // prevent default so tab doesn't navigate
-          }}
-        />
+        <Tab.Screen name="SOS" component={SOSScreen} />
         <Tab.Screen name="Status" component={StatusScreen} />
         <Tab.Screen name="Settings" component={SettingsScreen} />
         <Tab.Screen
@@ -110,7 +114,7 @@ function MainTabNavigator() {
       <SOSModal
         visible={isSOSModalVisible}
         onClose={() => setIsSOSModalVisible(false)}
-        navigation={tabNavigation} // Use the stored navigation reference
+        onNavigate={handleNavigateFromModal}
       />
     </>
   );
