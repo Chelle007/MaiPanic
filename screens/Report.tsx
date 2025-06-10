@@ -9,7 +9,6 @@ import {
     Alert,
     SafeAreaView,
     StatusBar,
-    ToastAndroid,
     Platform,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
@@ -66,21 +65,8 @@ const Report: React.FC<ReportProps> = ({ navigation }) => {
         { id: 'other', icon: AlertTriangle, label: 'Other Emergency', color: '#FF8000' }
     ];
 
-    // Function to show toast message
-    const showToast = (message: string) => {
-        if (Platform.OS === 'android') {
-            ToastAndroid.show(message, ToastAndroid.LONG);
-        } else {
-            // For iOS, you can use Alert as fallback or implement a custom toast
-            Alert.alert('Success', message);
-        }
-    };
-
     // Function to handle sending help request
     const handleSendHelpRequest = () => {
-        // Show toast message
-        showToast('Report submitted');
-
         // Reset form state
         setCurrentStep(1);
         setSelectedEmergency(null);
@@ -93,9 +79,9 @@ const Report: React.FC<ReportProps> = ({ navigation }) => {
             emergencyServices: false
         });
 
-        // Navigate back to home
+        // Navigate back to home with success parameter for custom toast
         if (navigation) {
-            navigation.navigate('Home');
+            navigation.navigate('Home', { showSuccessToast: true });
         }
     };
 
@@ -210,8 +196,8 @@ const Report: React.FC<ReportProps> = ({ navigation }) => {
                             key={emergency.id}
                             onPress={() => handleEmergencySelect(emergency)}
                             className={`w-[48%] p-6 rounded-2xl border-2 mb-4 ${selectedEmergency?.id === emergency.id
-                                    ? 'border-orange-500 bg-orange-500 bg-opacity-20'
-                                    : 'border-gray-600 bg-gray-800'
+                                ? 'border-orange-500 bg-orange-500 bg-opacity-20'
+                                : 'border-gray-600 bg-gray-800'
                                 }`}
                         >
                             <IconComponent

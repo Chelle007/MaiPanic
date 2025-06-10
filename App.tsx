@@ -6,12 +6,12 @@ import type { BottomTabNavigationEventMap } from '@react-navigation/bottom-tabs'
 import { Home, Copy, Users, Settings } from 'lucide-react-native';
 import { TouchableOpacity, View, Text } from 'react-native';
 
-import SOSModal from './components/SOSModal'; // Make sure this path is correct
+import SOSModal from './components/SOSModal';
 import HomeScreen from './screens/Home';
 import CirclesScreen from './screens/Circles';
 import StatusScreen from './screens/Status';
 import SettingsScreen from './screens/Settings';
-import ReportScreen from './screens/Report'; // Add your Report screen import
+import ReportScreen from './screens/Report';
 
 import './global.css'
 
