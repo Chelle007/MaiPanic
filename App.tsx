@@ -5,6 +5,7 @@ import type { NavigationHelpers, ParamListBase } from '@react-navigation/native'
 import type { BottomTabNavigationEventMap } from '@react-navigation/bottom-tabs';
 import { Home, Copy, Users, Settings } from 'lucide-react-native';
 import { TouchableOpacity, View, Text } from 'react-native';
+import SettingsStack from './navigation/SettingsStack';
 
 import SOSModal from './components/SOSModal';
 import HomeScreen from './screens/Home';
@@ -97,7 +98,7 @@ function MainTabNavigator() {
           }}
         />
         <Tab.Screen name="Status" component={StatusScreen} />
-        <Tab.Screen name="Settings" component={SettingsScreen} />
+        <Tab.Screen name="Settings" component={SettingsStack} />
         <Tab.Screen
           name="Report"
           component={ReportScreen}
