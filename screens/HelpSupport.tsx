@@ -5,7 +5,7 @@ import { Phone, MessageCircle, Mail, BookOpen, FileText, HelpCircle } from 'luci
 const HelpSupport = () => {
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
-      <Text style={styles.title}>Help & Support</Text>
+      {/* <Text style={styles.title}>Help & Support</Text> */}
 
       {/* Contact Support */}
       <Text style={styles.section}>CONTACT SUPPORT</Text>

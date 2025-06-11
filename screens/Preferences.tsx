@@ -23,7 +23,7 @@ const Preferences = () => {
     volume: 0.7,
     dndOverride: true,
     locationBased: true,
-    radius: '5km',
+    radius: '5',
     shareLocation: true,
   });
 
@@ -33,7 +33,7 @@ const Preferences = () => {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 60 }}>
-      <Text style={styles.title}>Preferences</Text>
+      {/* <Text style={styles.title}>Preferences</Text> */}
 
       {/* Emergency Alerts */}
       <Text style={styles.section}>🎗️ Emergency Alerts</Text>
@@ -65,12 +65,12 @@ const Preferences = () => {
       <Text style={styles.section}>📍 Location Services</Text>
       <SimpleToggle label="Location-Based Alerts" desc="Receive alerts relevant to your current location" value={prefs.locationBased} onToggle={() => toggle('locationBased')} />
 
-      <Text style={styles.subLabel}>Alert Radius</Text>
+      <Text style={styles.subLabel}>Alert Radius (km)</Text>
       <TextInput
         style={styles.input}
         value={prefs.radius}
         onChangeText={(v) => setPrefs({ ...prefs, radius: v })}
-        placeholder="5km"
+        placeholder="5"
         placeholderTextColor="#9CA3AF"
       />
 

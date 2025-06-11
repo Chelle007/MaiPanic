@@ -43,7 +43,7 @@ const EmergencyContacts = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Emergency Contacts</Text>
+      {/* <Text style={styles.title}>Emergency Contacts</Text> */}
       <Text style={styles.subheading}>QUICK ACCESS</Text>
 
       <FlatList
