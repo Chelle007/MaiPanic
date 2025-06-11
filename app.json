@@ -18,6 +18,12 @@
           "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
           "recordAudioAndroid": true
         }
+      ],
+      [
+        "expo-media-library",
+        {
+          "mediaLibraryPermission": "Allow $(PRODUCT_NAME) to access your media library"
+        }
       ]
     ],
     "orientation": "portrait",
