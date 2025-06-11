@@ -14,7 +14,7 @@ const EmergencyProfile = () => {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 80 }}>
-      <Text style={styles.header}>Emergency Profile</Text>
+      {/* <Text style={styles.header}>Emergency Profile</Text> */}
 
       {/* Personal Info */}
       <Text style={styles.sectionTitle}>🧍 Personal Information</Text>

@@ -18,8 +18,26 @@ export type SettingsStackParamList = {
 const Stack = createNativeStackNavigator<SettingsStackParamList>();
 
 const SettingsStack = () => (
-  <Stack.Navigator screenOptions={{ headerShown: true }}>
-    <Stack.Screen name="SettingsHome" component={SettingsHome} options={{ title: 'Settings' }} />
+  <Stack.Navigator
+  screenOptions={{
+    headerStyle: {
+      backgroundColor: '#101827',
+      elevation: 0,
+      shadowOpacity: 0,
+      borderBottomWidth: 0,
+    },
+    headerTintColor: '#FF8000',
+    headerTitleStyle: {
+      fontFamily: 'Poppins-SemiBold',
+    },
+    headerTitleAlign: 'center',
+  }}
+  >
+    <Stack.Screen
+      name="SettingsHome"
+      component={SettingsHome}
+      options={{ headerShown: false }}
+    />
     <Stack.Screen name="EmergencyProfile" component={EmergencyProfile} />
     <Stack.Screen name="EmergencyContacts" component={EmergencyContacts} />
     <Stack.Screen name="Preferences" component={Preferences} />
