@@ -269,12 +269,12 @@ const HomeScreen = ({ route }: HomeScreenProps) => {
           </View>
 
           {/* Recent Events List */}
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <ScrollView showsVerticalScrollIndicator={false}>
             {recentData.map((item) => (
-              <View key={item.id} className="mr-4 w-40">
+              <View key={item.id} className="mb-4 w-full">
                 <Image
                   source={item.image}
-                  style={{ width: '100%', height: 100, borderRadius: 8 }}
+                  style={{ width: '100%', height: 150, borderRadius: 8 }}
                   resizeMode="cover"
                 />
                 <Text className="text-white font-semibold mt-2">{item.location}</Text>
