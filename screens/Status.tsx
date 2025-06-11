@@ -553,7 +553,7 @@ const StatusScreen = () => {
                     <View className="w-full">
                         <TouchableOpacity
                             onPress={confirmEmergencyNudge}
-                            className={`py-3 rounded-xl mb-3 ${nudgeInterval ? 'bg-red-500' : 'bg-orange-500'}`}
+                            className={`px-4 py-3 rounded-xl mb-3 ${nudgeInterval ? 'bg-red-500' : 'bg-orange-500'}`}
                         >
                             <Text className="text-white text-base font-semibold text-center">
                                 {nudgeInterval ? 'Stop Nudging' : 'Start Emergency Nudge'}
