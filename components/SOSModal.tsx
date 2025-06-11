@@ -10,13 +10,13 @@ import {
 } from 'react-native';
 import { X, AlertTriangle } from 'lucide-react-native';
 
-type SOSModalProps = {
+interface SOSModalProps {
   visible: boolean;
   onClose: () => void;
-  navigation: any; // You can type this better with RootStackParamList if you like later
-};
+  onNavigate: (screenName: string) => void;
+}
 
-export default function SOSModal({ visible, onClose, navigation }: SOSModalProps) {
+export default function SOSModal({ visible, onClose, onNavigate }: SOSModalProps) {
   const [sliderValue, setSliderValue] = useState(0);
   const [isSOSActive, setIsSOSActive] = useState(false);
   const [containerWidth, setContainerWidth] = useState(200);
@@ -44,10 +44,18 @@ export default function SOSModal({ visible, onClose, navigation }: SOSModalProps
         if (isActivated && !isSOSActive) {
           setIsSOSActive(true);
           setSliderValue(100);
-          Alert.alert(
-            'SOS Activated',
-            'Emergency services and your emergency contacts have been notified.'
-          );
+
+          console.log('SOS activated, navigating to SOS screen');
+
+          // Navigate to SOS screen
+          onNavigate('SOS');
+
+          // Reset state after navigation
+          setTimeout(() => {
+            setIsSOSActive(false);
+            setSliderValue(0);
+          }, 200);
+
         } else if (isSOSActive) {
           setIsSOSActive(false);
           setSliderValue(0);
@@ -65,8 +73,8 @@ export default function SOSModal({ visible, onClose, navigation }: SOSModalProps
   ).current;
 
   const handleReportIncident = () => {
-    onClose(); // Close the modal first
-    navigation.navigate('Report'); // Then navigate to Report screen
+    console.log('Navigating to Report screen');
+    onNavigate('Report');
   };
 
   return (
