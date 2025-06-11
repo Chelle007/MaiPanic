@@ -1,4 +1,4 @@
-import React, { useRef, useMemo } from 'react';
+import React, { useRef, useMemo, useState, useEffect } from 'react';
 import {
   View,
   StyleSheet,
@@ -6,11 +6,35 @@ import {
   Text,
   Image,
   ScrollView,
+  Animated,
 } from 'react-native';
 import MapView, { Marker, Region } from 'react-native-maps';
 import type { MapView as MapViewType } from 'react-native-maps';
 import { Modalize } from 'react-native-modalize';
 import { useNavigation } from '@react-navigation/native';
+import { CheckCircle } from 'lucide-react-native';
+import type { NavigationProp } from '@react-navigation/native';
+
+// Define your navigation stack type
+type RootStackParamList = {
+  Home: undefined;
+  BombShelters: undefined;
+  // Add other screens here as needed
+};
+
+interface CustomToastProps {
+  visible: boolean;
+  message: string;
+  onHide: () => void;
+}
+
+interface HomeScreenProps {
+  route?: {
+    params?: {
+      showSuccessToast?: boolean;
+    };
+  };
+}
 
 // Shelter coordinates
 const shelterData = [
@@ -73,11 +97,93 @@ const recentData = [
   },
 ];
 
-const HomeScreen = () => {
+const CustomToast: React.FC<CustomToastProps> = ({ visible, message, onHide }) => {
+  const [fadeAnim] = useState(new Animated.Value(0));
+  const [slideAnim] = useState(new Animated.Value(-100));
+
+  useEffect(() => {
+    if (visible) {
+      // Show animation
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]).start();
+
+      // Auto hide after 3 seconds
+      const timer = setTimeout(() => {
+        hideToast();
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [visible]);
+
+  const hideToast = () => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: -100,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      onHide();
+    });
+  };
+
+  if (!visible) return null;
+
+  return (
+    <Animated.View
+      style={{
+        position: 'absolute',
+        top: 60,
+        left: 20,
+        right: 20,
+        zIndex: 1000,
+        opacity: fadeAnim,
+        transform: [{ translateY: slideAnim }],
+      }}
+    >
+      <View className="bg-green-500 rounded-xl p-4 flex-row items-center shadow-lg">
+        <CheckCircle size={24} color="white" style={{ marginRight: 12 }} />
+        <Text className="text-white font-semibold flex-1">{message}</Text>
+      </View>
+    </Animated.View>
+  );
+};
+
+const HomeScreen = ({ route }: HomeScreenProps) => {
   const mapRef = useRef<MapViewType | null>(null);
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const bottomSheetRef = useRef<Modalize>(null);
   const snapPoints = useMemo(() => ['40%', '50%', '90%'], []);
+
+  // Toast state
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+
+  useEffect(() => {
+    // Check if we received a success message from navigation params
+    if (route?.params?.showSuccessToast) {
+      setToastMessage('Report submitted successfully! 🚨');
+      setShowToast(true);
+      // Clear the param to prevent showing toast again
+      route.params.showSuccessToast = false;
+    }
+  }, [route?.params]);
 
   const handleRecenter = () => {
     const singaporeRegion: Region = {
@@ -91,6 +197,13 @@ const HomeScreen = () => {
 
   return (
     <View className="flex-1">
+      {/* Toast Notification */}
+      <CustomToast
+        visible={showToast}
+        message={toastMessage}
+        onHide={() => setShowToast(false)}
+      />
+
       {/* Map */}
       <MapView
         ref={mapRef}
@@ -156,7 +269,7 @@ const HomeScreen = () => {
           </View>
 
           {/* Recent Events List */}
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <ScrollView showsVerticalScrollIndicator={false} className="h-70 pt-5 ">
             {recentData.map((item) => (
               <View key={item.id} className="mr-4 w-40">
                 <Image
@@ -169,6 +282,12 @@ const HomeScreen = () => {
               </View>
             ))}
           </ScrollView>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Report')}
+            className="mt-4 bg-orange-500 py-3 rounded-xl items-center"
+          >
+            <Text className="text-white font-semibold text-lg">＋ Add Incident Report</Text>
+          </TouchableOpacity>
         </View>
       </Modalize>
     </View>
