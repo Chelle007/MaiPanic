@@ -134,14 +134,14 @@ const HomeScreen = () => {
       >
         <View className="px-6 pt-4">
           {/* Bomb Shelter & Recents Buttons */}
-          <View className="flex-row justify-between mb-4">
+          <View className="flex-row justify-center gap-x-20 mb-4">
             <TouchableOpacity
               className="items-center"
               onPress={() => navigation.navigate('BombShelters')}
             >
               <Image
                 source={require('../assets/bombshelter.png')}
-                style={{ width: 40, height: 40 }}
+                style={{ width: 60, height: 40 }}
               />
               <Text className="text-white text-xs mt-1">Bomb Shelters</Text>
             </TouchableOpacity>
