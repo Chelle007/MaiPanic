@@ -42,7 +42,7 @@ interface Notifications {
 }
 
 interface ReportProps {
-    navigation?: any; // Add navigation prop
+    navigation?: any;
 }
 
 const Report: React.FC<ReportProps> = ({ navigation }) => {
@@ -65,9 +65,7 @@ const Report: React.FC<ReportProps> = ({ navigation }) => {
         { id: 'other', icon: AlertTriangle, label: 'Other Emergency', color: '#FF8000' }
     ];
 
-    // Function to handle sending help request
     const handleSendHelpRequest = () => {
-        // Reset form state
         setCurrentStep(1);
         setSelectedEmergency(null);
         setNotes('');
@@ -79,7 +77,6 @@ const Report: React.FC<ReportProps> = ({ navigation }) => {
             emergencyServices: false
         });
 
-        // Navigate back to home with success parameter for custom toast
         if (navigation) {
             navigation.navigate('Home', { showSuccessToast: true });
         }
@@ -182,29 +179,31 @@ const Report: React.FC<ReportProps> = ({ navigation }) => {
     };
 
     const renderStep1 = () => (
-        <View className="space-y-6">
-            <View className="text-center mb-8">
-                <Text className="text-2xl font-bold text-white mb-2">Choose Emergency Type</Text>
-                <Text className="text-gray-400">Select the type of help you need</Text>
+        <View className="gap-6">
+            <View className="items-center mb-8">
+                <Text className="text-2xl font-bold text-white mb-2 text-center">Choose Emergency Type</Text>
+                <Text className="text-gray-400 text-center">Select the type of help you need</Text>
             </View>
 
-            <View className="flex-row flex-wrap justify-between">
+            <View className="flex-row flex-wrap justify-between gap-4">
                 {emergencyTypes.map((emergency) => {
                     const IconComponent = emergency.icon;
+                    const isSelected = selectedEmergency?.id === emergency.id;
                     return (
                         <TouchableOpacity
                             key={emergency.id}
                             onPress={() => handleEmergencySelect(emergency)}
-                            className={`w-[48%] p-6 rounded-2xl border-2 mb-4 ${selectedEmergency?.id === emergency.id
-                                ? 'border-orange-500 bg-orange-500 bg-opacity-20'
-                                : 'border-gray-600 bg-gray-800'
+                            className={`w-[47%] p-6 rounded-2xl border-2 items-center ${isSelected
+                                    ? 'border-orange-500 bg-orange-500/20'
+                                    : 'border-gray-600 bg-gray-800'
                                 }`}
                         >
-                            <IconComponent
-                                size={40}
-                                color={selectedEmergency?.id === emergency.id ? '#f97316' : '#ffffff'}
-                                style={{ alignSelf: 'center', marginBottom: 12 }}
-                            />
+                            <View className="mb-3">
+                                <IconComponent
+                                    size={40}
+                                    color={isSelected ? '#f97316' : '#ffffff'}
+                                />
+                            </View>
                             <Text className="text-white font-medium text-sm text-center">
                                 {emergency.label}
                             </Text>
@@ -216,15 +215,15 @@ const Report: React.FC<ReportProps> = ({ navigation }) => {
     );
 
     const renderStep2 = () => (
-        <View className="space-y-6">
-            <View className="text-center mb-8">
-                <Text className="text-2xl font-bold text-white mb-2">Add Details</Text>
-                <Text className="text-gray-400">Provide additional information (optional)</Text>
+        <View className="gap-6">
+            <View className="items-center mb-8">
+                <Text className="text-2xl font-bold text-white mb-2 text-center">Add Details</Text>
+                <Text className="text-gray-400 text-center">Provide additional information (optional)</Text>
             </View>
 
-            <View className="space-y-6">
-                <View>
-                    <Text className="text-white font-medium mb-3">What happened?</Text>
+            <View className="gap-6">
+                <View className="gap-3">
+                    <Text className="text-white font-medium text-base">What happened?</Text>
                     <TextInput
                         value={notes}
                         onChangeText={setNotes}
@@ -232,23 +231,24 @@ const Report: React.FC<ReportProps> = ({ navigation }) => {
                         placeholderTextColor="#9CA3AF"
                         multiline
                         numberOfLines={4}
-                        className="w-full p-4 bg-gray-800 border border-gray-600 rounded-xl text-white"
-                        style={{ textAlignVertical: 'top' }}
+                        className="w-full p-4 bg-gray-800 border border-gray-600 rounded-xl text-white text-base"
+                        style={{ textAlignVertical: 'top', minHeight: 100 }}
                     />
                 </View>
 
-                <View>
-                    <Text className="text-white font-medium mb-3">Add Photo (Optional)</Text>
+                <View className="gap-3">
+                    <Text className="text-white font-medium text-base">Add Photo (Optional)</Text>
                     <TouchableOpacity
                         onPress={showPhotoOptions}
                         className="p-6 bg-gray-800 border-2 border-dashed border-gray-600 rounded-xl items-center justify-center"
+                        style={{ minHeight: 120 }}
                     >
                         {photo ? (
                             <Image source={{ uri: photo }} className="w-32 h-32 rounded-lg" />
                         ) : (
-                            <View className="items-center">
-                                <Camera size={32} color="#9CA3AF" style={{ marginBottom: 8 }} />
-                                <Text className="text-gray-400">Tap to add photo</Text>
+                            <View className="items-center gap-2">
+                                <Camera size={32} color="#9CA3AF" />
+                                <Text className="text-gray-400 text-base">Tap to add photo</Text>
                             </View>
                         )}
                     </TouchableOpacity>
@@ -256,11 +256,11 @@ const Report: React.FC<ReportProps> = ({ navigation }) => {
 
                 <TouchableOpacity
                     onPress={requestLocationPermission}
-                    className="flex-row items-center p-4 bg-gray-800 rounded-xl"
+                    className="flex-row items-center p-4 bg-gray-800 rounded-xl gap-3"
                 >
-                    <MapPin size={20} color="#f97316" style={{ marginRight: 12 }} />
-                    <View>
-                        <Text className="text-white font-medium">Current Location</Text>
+                    <MapPin size={20} color="#f97316" />
+                    <View className="flex-1 gap-1">
+                        <Text className="text-white font-medium text-base">Current Location</Text>
                         <Text className="text-gray-400 text-sm">
                             {location ? 'Location captured' : 'Tap to get GPS coordinates'}
                         </Text>
@@ -269,44 +269,44 @@ const Report: React.FC<ReportProps> = ({ navigation }) => {
 
                 <TouchableOpacity
                     onPress={() => setCurrentStep(3)}
-                    className="w-full bg-orange-500 py-4 rounded-xl items-center justify-center flex-row"
+                    className="w-full bg-orange-500 py-4 rounded-xl items-center justify-center flex-row gap-2"
                 >
-                    <Text className="text-white font-semibold">Continue</Text>
-                    <ChevronRight size={20} color="#ffffff" style={{ marginLeft: 8 }} />
+                    <Text className="text-white font-semibold text-base">Continue</Text>
+                    <ChevronRight size={20} color="#ffffff" />
                 </TouchableOpacity>
             </View>
         </View>
     );
 
     const renderStep3 = () => (
-        <View className="space-y-6">
-            <View className="text-center mb-8">
-                <Text className="text-2xl font-bold text-white mb-2">Who to Notify</Text>
-                <Text className="text-gray-400">Choose who should receive your help request</Text>
+        <View className="gap-6">
+            <View className="items-center mb-8">
+                <Text className="text-2xl font-bold text-white mb-2 text-center">Who to Notify</Text>
+                <Text className="text-gray-400 text-center">Choose who should receive your help request</Text>
             </View>
 
-            <View className="space-y-4">
-                <View className="p-4 bg-gray-800 rounded-xl">
-                    <View className="flex-row items-center justify-between mb-2">
-                        <View className="flex-row items-center flex-1">
-                            <Users size={24} color="#f97316" style={{ marginRight: 12 }} />
-                            <View>
-                                <Text className="text-white font-medium">Nearby Users</Text>
+            <View className="gap-4">
+                <View className="p-4 bg-gray-800 rounded-xl gap-2">
+                    <View className="flex-row items-center justify-between">
+                        <View className="flex-row items-center flex-1 gap-3">
+                            <Users size={24} color="#f97316" />
+                            <View className="flex-1 gap-1">
+                                <Text className="text-white font-medium text-base">Nearby Users</Text>
                                 <Text className="text-gray-400 text-sm">App users within 2km radius</Text>
                             </View>
                         </View>
                         <TouchableOpacity
                             onPress={() => handleNotificationToggle('nearbyUsers')}
-                            className={`w-12 h-6 rounded-full justify-center ${notifications.nearbyUsers ? 'bg-orange-500' : 'bg-gray-600'
+                            className={`w-12 h-6 rounded-full justify-center p-0.5 ${notifications.nearbyUsers ? 'bg-orange-500' : 'bg-gray-600'
                                 }`}
                         >
-                            <View className={`w-4 h-4 bg-white rounded-full ${notifications.nearbyUsers ? 'self-end mr-1' : 'self-start ml-1'
+                            <View className={`w-4 h-4 bg-white rounded-full ${notifications.nearbyUsers ? 'self-end' : 'self-start'
                                 }`} />
                         </TouchableOpacity>
                     </View>
                     {notifications.nearbyUsers && (
-                        <View className="flex-row items-center mt-2">
-                            <Clock size={16} color="#10B981" style={{ marginRight: 8 }} />
+                        <View className="flex-row items-center mt-2 gap-2">
+                            <Clock size={16} color="#10B981" />
                             <Text className="text-green-500 text-sm">
                                 Est. response: {getResponseTime('nearbyUsers')}
                             </Text>
@@ -314,27 +314,27 @@ const Report: React.FC<ReportProps> = ({ navigation }) => {
                     )}
                 </View>
 
-                <View className="p-4 bg-gray-800 rounded-xl">
-                    <View className="flex-row items-center justify-between mb-2">
-                        <View className="flex-row items-center flex-1">
-                            <Phone size={24} color="#f97316" style={{ marginRight: 12 }} />
-                            <View>
-                                <Text className="text-white font-medium">Trusted Contacts</Text>
+                <View className="p-4 bg-gray-800 rounded-xl gap-2">
+                    <View className="flex-row items-center justify-between">
+                        <View className="flex-row items-center flex-1 gap-3">
+                            <Phone size={24} color="#f97316" />
+                            <View className="flex-1 gap-1">
+                                <Text className="text-white font-medium text-base">Trusted Contacts</Text>
                                 <Text className="text-gray-400 text-sm">Your emergency contacts</Text>
                             </View>
                         </View>
                         <TouchableOpacity
                             onPress={() => handleNotificationToggle('trustedContacts')}
-                            className={`w-12 h-6 rounded-full justify-center ${notifications.trustedContacts ? 'bg-orange-500' : 'bg-gray-600'
+                            className={`w-12 h-6 rounded-full justify-center p-0.5 ${notifications.trustedContacts ? 'bg-orange-500' : 'bg-gray-600'
                                 }`}
                         >
-                            <View className={`w-4 h-4 bg-white rounded-full ${notifications.trustedContacts ? 'self-end mr-1' : 'self-start ml-1'
+                            <View className={`w-4 h-4 bg-white rounded-full ${notifications.trustedContacts ? 'self-end' : 'self-start'
                                 }`} />
                         </TouchableOpacity>
                     </View>
                     {notifications.trustedContacts && (
-                        <View className="flex-row items-center mt-2">
-                            <Clock size={16} color="#10B981" style={{ marginRight: 8 }} />
+                        <View className="flex-row items-center mt-2 gap-2">
+                            <Clock size={16} color="#10B981" />
                             <Text className="text-green-500 text-sm">
                                 Est. response: {getResponseTime('trustedContacts')}
                             </Text>
@@ -342,27 +342,27 @@ const Report: React.FC<ReportProps> = ({ navigation }) => {
                     )}
                 </View>
 
-                <View className="p-4 bg-gray-800 rounded-xl">
-                    <View className="flex-row items-center justify-between mb-2">
-                        <View className="flex-row items-center flex-1">
-                            <Shield size={24} color="#f97316" style={{ marginRight: 12 }} />
-                            <View>
-                                <Text className="text-white font-medium">Emergency Services</Text>
+                <View className="p-4 bg-gray-800 rounded-xl gap-2">
+                    <View className="flex-row items-center justify-between">
+                        <View className="flex-row items-center flex-1 gap-3">
+                            <Shield size={24} color="#f97316" />
+                            <View className="flex-1 gap-1">
+                                <Text className="text-white font-medium text-base">Emergency Services</Text>
                                 <Text className="text-gray-400 text-sm">Police, Fire, Medical services</Text>
                             </View>
                         </View>
                         <TouchableOpacity
                             onPress={() => handleNotificationToggle('emergencyServices')}
-                            className={`w-12 h-6 rounded-full justify-center ${notifications.emergencyServices ? 'bg-orange-500' : 'bg-gray-600'
+                            className={`w-12 h-6 rounded-full justify-center p-0.5 ${notifications.emergencyServices ? 'bg-orange-500' : 'bg-gray-600'
                                 }`}
                         >
-                            <View className={`w-4 h-4 bg-white rounded-full ${notifications.emergencyServices ? 'self-end mr-1' : 'self-start ml-1'
+                            <View className={`w-4 h-4 bg-white rounded-full ${notifications.emergencyServices ? 'self-end' : 'self-start'
                                 }`} />
                         </TouchableOpacity>
                     </View>
                     {notifications.emergencyServices && (
-                        <View className="flex-row items-center mt-2">
-                            <Clock size={16} color="#10B981" style={{ marginRight: 8 }} />
+                        <View className="flex-row items-center mt-2 gap-2">
+                            <Clock size={16} color="#10B981" />
                             <Text className="text-green-500 text-sm">
                                 Est. response: {getResponseTime('emergencyServices')}
                             </Text>
@@ -373,67 +373,67 @@ const Report: React.FC<ReportProps> = ({ navigation }) => {
 
             <TouchableOpacity
                 onPress={() => setCurrentStep(4)}
-                className="w-full bg-orange-500 py-4 rounded-xl items-center justify-center flex-row"
+                className="w-full bg-orange-500 py-4 rounded-xl items-center justify-center flex-row gap-2"
             >
-                <Text className="text-white font-semibold">Continue</Text>
-                <ChevronRight size={20} color="#ffffff" style={{ marginLeft: 8 }} />
+                <Text className="text-white font-semibold text-base">Continue</Text>
+                <ChevronRight size={20} color="#ffffff" />
             </TouchableOpacity>
         </View>
     );
 
     const renderStep4 = () => (
-        <View className="space-y-6">
-            <View className="text-center mb-8">
-                <Text className="text-2xl font-bold text-white mb-2">Send Help Request</Text>
-                <Text className="text-gray-400">Review and send your emergency request</Text>
+        <View className="gap-6">
+            <View className="items-center mb-8">
+                <Text className="text-2xl font-bold text-white mb-2 text-center">Send Help Request</Text>
+                <Text className="text-gray-400 text-center">Review and send your emergency request</Text>
             </View>
 
-            <View className="space-y-4">
-                <View className="p-4 bg-gray-800 rounded-xl">
-                    <Text className="text-white font-medium mb-2">Emergency Type</Text>
-                    <View className="flex-row items-center">
+            <View className="gap-4">
+                <View className="p-4 bg-gray-800 rounded-xl gap-2">
+                    <Text className="text-white font-medium mb-2 text-base">Emergency Type</Text>
+                    <View className="flex-row items-center gap-2">
                         {selectedEmergency && (
                             <>
-                                <selectedEmergency.icon size={20} color="#f97316" style={{ marginRight: 8 }} />
-                                <Text className="text-gray-300">{selectedEmergency.label}</Text>
+                                <selectedEmergency.icon size={20} color="#f97316" />
+                                <Text className="text-gray-300 text-base">{selectedEmergency.label}</Text>
                             </>
                         )}
                     </View>
                 </View>
 
                 {notes ? (
-                    <View className="p-4 bg-gray-800 rounded-xl">
-                        <Text className="text-white font-medium mb-2">Additional Notes</Text>
-                        <Text className="text-gray-300">{notes}</Text>
+                    <View className="p-4 bg-gray-800 rounded-xl gap-2">
+                        <Text className="text-white font-medium mb-2 text-base">Additional Notes</Text>
+                        <Text className="text-gray-300 text-base">{notes}</Text>
                     </View>
                 ) : null}
 
-                <View className="p-4 bg-gray-800 rounded-xl">
-                    <Text className="text-white font-medium mb-2">Notifications</Text>
-                    <View className="space-y-2">
+                <View className="p-4 bg-gray-800 rounded-xl gap-2">
+                    <Text className="text-white font-medium mb-2 text-base">Notifications</Text>
+                    <View className="gap-2">
                         {notifications.nearbyUsers && (
-                            <View className="flex-row items-center">
-                                <Users size={16} color="#D1D5DB" style={{ marginRight: 8 }} />
-                                <Text className="text-gray-300">Nearby Users</Text>
+                            <View className="flex-row items-center gap-2">
+                                <Users size={16} color="#D1D5DB" />
+                                <Text className="text-gray-300 text-base">Nearby Users</Text>
                             </View>
                         )}
                         {notifications.trustedContacts && (
-                            <View className="flex-row items-center">
-                                <Phone size={16} color="#D1D5DB" style={{ marginRight: 8 }} />
-                                <Text className="text-gray-300">Trusted Contacts</Text>
+                            <View className="flex-row items-center gap-2">
+                                <Phone size={16} color="#D1D5DB" />
+                                <Text className="text-gray-300 text-base">Trusted Contacts</Text>
                             </View>
                         )}
                         {notifications.emergencyServices && (
-                            <View className="flex-row items-center">
-                                <Shield size={16} color="#D1D5DB" style={{ marginRight: 8 }} />
-                                <Text className="text-gray-300">Emergency Services</Text>
+                            <View className="flex-row items-center gap-2">
+                                <Shield size={16} color="#D1D5DB" />
+                                <Text className="text-gray-300 text-base">Emergency Services</Text>
                             </View>
                         )}
                     </View>
                 </View>
             </View>
 
-            <View className="space-y-3">
+            <View className="gap-3 mt-2">
                 <TouchableOpacity
                     onPress={handleSendHelpRequest}
                     className="w-full bg-red-500 py-4 rounded-xl items-center justify-center"
@@ -444,7 +444,7 @@ const Report: React.FC<ReportProps> = ({ navigation }) => {
                     onPress={() => setCurrentStep(1)}
                     className="w-full bg-gray-700 py-3 rounded-xl items-center justify-center"
                 >
-                    <Text className="text-white font-medium">Start Over</Text>
+                    <Text className="text-white font-medium text-base">Start Over</Text>
                 </TouchableOpacity>
             </View>
         </View>
@@ -453,9 +453,16 @@ const Report: React.FC<ReportProps> = ({ navigation }) => {
     return (
         <SafeAreaView className="flex-1 bg-gray-900">
             <StatusBar barStyle="light-content" backgroundColor="#111827" />
-            <ScrollView className="flex-1 px-6 py-4">
+            <ScrollView
+                className="flex-1"
+                contentContainerStyle={{
+                    paddingHorizontal: 24,
+                    paddingVertical: 16,
+                    paddingBottom: 32
+                }}
+            >
                 {/* Progress Indicator */}
-                <View className="flex-row items-center justify-center mb-8">
+                <View className="flex-row items-center justify-center mb-8 gap-2">
                     {[1, 2, 3, 4].map((step) => (
                         <View key={step} className="flex-row items-center">
                             <View className={`w-8 h-8 rounded-full items-center justify-center ${currentStep >= step ? 'bg-orange-500' : 'bg-gray-700'
@@ -485,7 +492,7 @@ const Report: React.FC<ReportProps> = ({ navigation }) => {
                         onPress={() => setCurrentStep(currentStep - 1)}
                         className="w-full mt-4 bg-gray-700 py-3 rounded-xl items-center justify-center"
                     >
-                        <Text className="text-white font-medium">Back</Text>
+                        <Text className="text-white font-medium text-base">Back</Text>
                     </TouchableOpacity>
                 )}
             </ScrollView>
