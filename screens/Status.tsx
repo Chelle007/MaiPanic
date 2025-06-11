@@ -56,7 +56,8 @@ const StatusScreen = () => {
 
     const [selectedMember, setSelectedMember] = useState<FamilyMember | null>(null);
     const [showEmergencyNudgeModal, setShowEmergencyNudgeModal] = useState(false);
-    const [showLostFoundModal, setShowLostFoundModal] = useState(false); const [nudgeInterval, setNudgeInterval] = useState<ReturnType<typeof setInterval> | null>(null);
+    const [showLostFoundModal, setShowLostFoundModal] = useState(false);
+    const [nudgeInterval, setNudgeInterval] = useState<ReturnType<typeof setInterval> | null>(null);
 
     const [currentTime, setCurrentTime] = useState(new Date());
     const [selectedCircleId, setSelectedCircleId] = useState(1);
@@ -351,71 +352,75 @@ const StatusScreen = () => {
         const StatusIcon = getStatusIcon(member.status);
 
         return (
-            <TouchableOpacity
+            <View
                 key={member.id}
-                className="bg-gray-800 rounded-xl p-4 border border-gray-600"
-                onPress={() => setSelectedMember(member)}
+                className="mb-3" // Add explicit margin bottom instead of relying on space-y
             >
-                <View className="flex-row justify-between items-center">
-                    <View className="flex-row items-center flex-1">
-                        <View className="relative mr-3">
-                            <View
-                                className={`w-12 h-12 rounded-full justify-center items-center ${getStatusColor(member.status)}`}
-                            >
-                                <Text className="text-white font-bold text-lg">{member.avatar}</Text>
-                            </View>
-                            {!member.isOnline && (
-                                <View className="absolute -bottom-1 -right-1 w-4 h-4 bg-gray-500 rounded-full border-2 border-gray-800 justify-center items-center">
-                                    <WifiOff size={8} color="white" />
+                <TouchableOpacity
+                    className="bg-gray-800 rounded-xl p-4 border border-gray-600"
+                    onPress={() => setSelectedMember(member)}
+                >
+                    <View className="flex-row justify-between items-center">
+                        <View className="flex-row items-center flex-1">
+                            <View className="relative mr-3">
+                                <View
+                                    className={`w-12 h-12 rounded-full justify-center items-center ${getStatusColor(member.status)}`}
+                                >
+                                    <Text className="text-white font-bold text-lg">{member.avatar}</Text>
                                 </View>
-                            )}
-                        </View>
-
-                        <View className="flex-1">
-                            <Text className="text-white text-base font-semibold mb-1">{member.name}</Text>
-                            <View className="flex-row items-center mb-1">
-                                <MapPin size={14} color="#9CA3AF" />
-                                <Text className="text-gray-400 text-sm ml-1">{member.location}</Text>
+                                {!member.isOnline && (
+                                    <View className="absolute -bottom-1 -right-1 w-4 h-4 bg-gray-500 rounded-full border-2 border-gray-800 justify-center items-center">
+                                        <WifiOff size={8} color="white" />
+                                    </View>
+                                )}
                             </View>
-                            <View className="flex-row items-center">
-                                <View className="flex-row items-center mr-4">
-                                    <Clock size={12} color="#6B7280" />
-                                    <Text className="text-gray-500 text-xs ml-1">{formatTimeAgo(member.lastSeen)}</Text>
+
+                            <View className="flex-1">
+                                <Text className="text-white text-base font-semibold mb-1">{member.name}</Text>
+                                <View className="flex-row items-center mb-1">
+                                    <MapPin size={14} color="#9CA3AF" />
+                                    <Text className="text-gray-400 text-sm ml-1">{member.location}</Text>
                                 </View>
                                 <View className="flex-row items-center">
-                                    <Battery size={12} color={member.battery > 50 ? '#10B981' : member.battery > 20 ? '#F59E0B' : '#EF4444'} />
-                                    <Text className={`text-xs ml-1 ${getBatteryColor(member.battery)}`}>{member.battery}%</Text>
+                                    <View className="flex-row items-center mr-4">
+                                        <Clock size={12} color="#6B7280" />
+                                        <Text className="text-gray-500 text-xs ml-1">{formatTimeAgo(member.lastSeen)}</Text>
+                                    </View>
+                                    <View className="flex-row items-center">
+                                        <Battery size={12} color={member.battery > 50 ? '#10B981' : member.battery > 20 ? '#F59E0B' : '#EF4444'} />
+                                        <Text className={`text-xs ml-1 ${getBatteryColor(member.battery)}`}>{member.battery}%</Text>
+                                    </View>
                                 </View>
                             </View>
                         </View>
+
+                        <View className="flex-row items-center">
+                            <StatusIcon
+                                size={20}
+                                color={member.status === 'safe' ? '#10B981' : member.status === 'help' ? '#EF4444' : '#F59E0B'}
+                            />
+                            <ChevronRight size={16} color="#9CA3AF" className="ml-2" />
+                        </View>
                     </View>
 
-                    <View className="flex-row items-center">
-                        <StatusIcon
-                            size={20}
-                            color={member.status === 'safe' ? '#10B981' : member.status === 'help' ? '#EF4444' : '#F59E0B'}
-                        />
-                        <ChevronRight size={16} color="#9CA3AF" className="ml-2" />
-                    </View>
-                </View>
-
-                {!member.name.includes('You') && (
-                    <View className="flex-row mt-3 pt-3 border-t border-gray-600">
-                        <TouchableOpacity
-                            onPress={() => handleNudgeMember(member.id)}
-                            className="flex-1 bg-orange-500/20 py-2 px-3 rounded-lg mr-2"
-                        >
-                            <Text className="text-orange-500 text-sm font-semibold text-center">Nudge</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity className="bg-gray-600 p-2 rounded-lg mr-1">
-                            <Phone size={16} color="white" />
-                        </TouchableOpacity>
-                        <TouchableOpacity className="bg-gray-600 p-2 rounded-lg">
-                            <MessageCircle size={16} color="white" />
-                        </TouchableOpacity>
-                    </View>
-                )}
-            </TouchableOpacity>
+                    {!member.name.includes('You') && (
+                        <View className="flex-row mt-3 pt-3 border-t border-gray-600">
+                            <TouchableOpacity
+                                onPress={() => handleNudgeMember(member.id)}
+                                className="flex-1 bg-orange-500/20 py-2 px-3 rounded-lg mr-2"
+                            >
+                                <Text className="text-orange-500 text-sm font-semibold text-center">Nudge</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity className="bg-gray-600 p-2 rounded-lg mr-1">
+                                <Phone size={16} color="white" />
+                            </TouchableOpacity>
+                            <TouchableOpacity className="bg-gray-600 p-2 rounded-lg">
+                                <MessageCircle size={16} color="white" />
+                            </TouchableOpacity>
+                        </View>
+                    )}
+                </TouchableOpacity>
+            </View>
         );
     };
 
@@ -455,7 +460,7 @@ const StatusScreen = () => {
                             </TouchableOpacity>
                         </View>
 
-                        <ScrollView className="flex-1">
+                        <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
                             <View className="bg-gray-800 rounded-xl p-4 mb-4">
                                 <View className="flex-row justify-between items-center">
                                     <Text className="text-gray-400 text-sm">Status</Text>
@@ -473,8 +478,8 @@ const StatusScreen = () => {
                                 </View>
                             </View>
 
-                            <View className="flex-row mb-4">
-                                <View className="bg-gray-800 rounded-xl p-4 flex-1 mr-2">
+                            <View className="flex-row mb-4 gap-2"> {/* Added gap-2 for consistent spacing */}
+                                <View className="bg-gray-800 rounded-xl p-4 flex-1">
                                     <View className="flex-row items-center mb-2">
                                         <MapPin size={16} color="#F97316" />
                                         <Text className="text-gray-400 text-xs ml-2">Location</Text>
@@ -482,7 +487,7 @@ const StatusScreen = () => {
                                     <Text className="text-white text-base font-semibold">{selectedMember?.location}</Text>
                                 </View>
 
-                                <View className="bg-gray-800 rounded-xl p-4 flex-1 ml-2">
+                                <View className="bg-gray-800 rounded-xl p-4 flex-1">
                                     <View className="flex-row items-center mb-2">
                                         <Battery size={16} color={selectedMember?.battery && selectedMember.battery > 50 ? '#10B981' : selectedMember?.battery && selectedMember.battery > 20 ? '#F59E0B' : '#EF4444'} />
                                         <Text className="text-gray-400 text-xs ml-2">Battery</Text>
@@ -500,7 +505,7 @@ const StatusScreen = () => {
                             </View>
 
                             {!selectedMember?.name.includes('You') && (
-                                <View className="mt-4 mb-4">
+                                <View className="mt-4 mb-6"> {/* Added explicit margin bottom */}
                                     <TouchableOpacity
                                         onPress={() => handleNudgeMember(selectedMember?.id || 0)}
                                         className="bg-orange-500 py-3 rounded-xl mb-3"
@@ -508,12 +513,12 @@ const StatusScreen = () => {
                                         <Text className="text-white text-base font-semibold text-center">Send Check-In Nudge</Text>
                                     </TouchableOpacity>
 
-                                    <View className="flex-row">
-                                        <TouchableOpacity className="bg-gray-800 py-3 px-4 rounded-xl flex-1 flex-row justify-center items-center mr-2">
+                                    <View className="flex-row gap-2"> {/* Added gap-2 for consistent spacing */}
+                                        <TouchableOpacity className="bg-gray-800 py-3 px-4 rounded-xl flex-1 flex-row justify-center items-center">
                                             <Phone size={16} color="white" />
                                             <Text className="text-white text-sm font-semibold ml-2">Call</Text>
                                         </TouchableOpacity>
-                                        <TouchableOpacity className="bg-gray-800 py-3 px-4 rounded-xl flex-1 flex-row justify-center items-center ml-2">
+                                        <TouchableOpacity className="bg-gray-800 py-3 px-4 rounded-xl flex-1 flex-row justify-center items-center">
                                             <MessageCircle size={16} color="white" />
                                             <Text className="text-white text-sm font-semibold ml-2">Message</Text>
                                         </TouchableOpacity>
@@ -615,23 +620,26 @@ const StatusScreen = () => {
     return (
         <SafeAreaView className="flex-1 bg-gray-900">
             {/* Header */}
-            <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-800 bg-gray-900 z-50">
-                <View className="flex-1">
-                    <Text className="text-white text-xl font-bold">Family Circle</Text>
-                    <TouchableOpacity onPress={() => setShowCircleSelector(true)}>
-                        <View className="flex-row items-center">
-                            <Text className="text-orange-400 text-sm font-semibold mr-1">{currentCircle?.name}</Text>
-                            <ChevronDown size={14} color="#F97316" />
-                        </View>
+            <View className="pt-safe-area-top">
+                <View className="flex-row items-center justify-between px-4 py-3">
+                    {/* Left Section - Family Circle */}
+                    <TouchableOpacity
+                        onPress={() => setShowCircleSelector(true)}
+                        className="flex-row items-center flex-1 max-w-[60%]"
+                    >
+                        <Text className="text-white text-lg font-semibold truncate">
+                            {currentCircle?.name || 'Family Circle'}
+                        </Text>
+                        <ChevronDown className="ml-1 w-5 h-5" color="white" />
                     </TouchableOpacity>
-                </View>
-                <View className="flex-row items-center">
+
+                    {/* Right Section - Report Loss Button */}
                     <TouchableOpacity
                         onPress={() => setShowLostFoundModal(true)}
-                        className={`flex-1 p-2 rounded-xl flex-row justify-center items-center ml-2 bg-red-500`}
+                        className="px-4 py-2 rounded-xl flex-row justify-center items-center ml-2 bg-red-500"
                     >
                         <AlertTriangle size={20} color="white" />
-                        <Text className="text-white font-semibold text-base ml-3">
+                        <Text className="text-white font-medium ml-2">
                             Report Loss
                         </Text>
                     </TouchableOpacity>
@@ -639,21 +647,23 @@ const StatusScreen = () => {
 
                 {/* Dropdown Overlay */}
                 {showCircleSelector && (
-                    <View className="absolute top-full left-0 right-0 bg-gray-800 border border-gray-700 rounded-b-lg z-50">
-                        {familyCircles.map((circle) => (
-                            <TouchableOpacity
-                                key={circle.id}
-                                onPress={() => {
-                                    setSelectedCircleId(circle.id);
-                                    setShowCircleSelector(false);
-                                }}
-                                className="px-4 py-3 border-b border-gray-700"
-                            >
-                                <Text className={`text-white ${circle.id === selectedCircleId ? 'font-bold text-orange-400' : ''}`}>
-                                    {circle.name}
-                                </Text>
-                            </TouchableOpacity>
-                        ))}
+                    <View className="absolute top-full left-0 right-0 bg-gray-800 shadow-lg z-50">
+                        <ScrollView className="max-h-60">
+                            {familyCircles.map((circle) => (
+                                <TouchableOpacity
+                                    key={circle.id}
+                                    onPress={() => {
+                                        setSelectedCircleId(circle.id);
+                                        setShowCircleSelector(false);
+                                    }}
+                                    className="px-4 py-3 border-b border-gray-700"
+                                >
+                                    <Text className="text-white">
+                                        {circle.name}
+                                    </Text>
+                                </TouchableOpacity>
+                            ))}
+                        </ScrollView>
                     </View>
                 )}
             </View>
@@ -663,17 +673,17 @@ const StatusScreen = () => {
                 {renderMap()}
 
                 {/* Quick Actions */}
-                <View className="flex-row mb-6">
+                <View className="flex-row mb-6 gap-2"> {/* Added gap-2 for consistent spacing */}
                     <TouchableOpacity
                         onPress={handleMarkSafe}
-                        className="flex-1 bg-green-500 py-4 rounded-xl flex-row justify-center items-center mr-2"
+                        className="flex-1 bg-green-500 py-4 rounded-xl flex-row justify-center items-center"
                     >
                         <Shield size={20} color="white" />
                         <Text className="text-white font-semibold text-base ml-2">I'm Safe</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                         onPress={() => setShowEmergencyNudgeModal(true)}
-                        className={`flex-1 py-4 rounded-xl flex-row justify-center items-center ml-2 ${nudgeInterval ? 'bg-red-500' : 'bg-orange-500'
+                        className={`flex-1 py-4 rounded-xl flex-row justify-center items-center ${nudgeInterval ? 'bg-red-500' : 'bg-orange-500'
                             }`}
                     >
                         <AlertTriangle size={20} color="white" />
