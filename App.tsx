@@ -14,7 +14,7 @@ import SOSModal from './components/SOSModal';
 import HomeScreen from './screens/Home';
 import CirclesScreen from './screens/Circles';
 import StatusScreen from './screens/Status';
-import SettingsScreen from './screens/Settings';
+import SettingsStack from './navigation/SettingsStack';
 import SOSScreen from './screens/SOS';
 import ReportScreen from './screens/Report';
 import BombSheltersScreen from './screens/BombShelters';
@@ -117,7 +117,7 @@ function MainTabNavigator() {
         <Tab.Screen name="Circles" component={CirclesScreen} />
         <Tab.Screen name="SOS" component={SOSScreen} />
         <Tab.Screen name="Status" component={StatusScreen} />
-        <Tab.Screen name="Settings" component={SettingsScreen} />
+        <Tab.Screen name="Settings" component={SettingsStack} />
         <Tab.Screen
           name="Report"
           component={ReportScreen}
