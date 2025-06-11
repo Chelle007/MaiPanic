@@ -68,16 +68,6 @@ export default function VideoPage() {
         </View>
       </ScrollView>
 
-      {/* Bottom Nav */}
-      <View className="absolute bottom-0 left-0 right-0 h-16 bg-slate-900 flex-row justify-around items-center">
-        <TouchableOpacity><Home color="white" /></TouchableOpacity>
-        <TouchableOpacity><Video color="white" /></TouchableOpacity>
-        <TouchableOpacity className="bg-red-500 rounded-full p-4 -mt-10 z-10 shadow-md">
-          <Text className="text-white font-bold">SOS</Text>
-        </TouchableOpacity>
-        <TouchableOpacity><Bell color="white" /></TouchableOpacity>
-        <TouchableOpacity><User color="white" /></TouchableOpacity>
-      </View>
     </View>
   );
 }
