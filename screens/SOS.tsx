@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Text, View, TouchableOpacity, Alert } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import * as MediaLibrary from 'expo-media-library';
@@ -11,7 +11,7 @@ export default function SOSScreen() {
     const [permission, requestPermission] = useCameraPermissions();
     const [mediaLibraryPermission, requestMediaLibraryPermission] = MediaLibrary.usePermissions();
     const cameraRef = useRef<CameraView>(null);
-    const router = useRouter();
+    const navigation = useNavigation();
 
     const handleEndCall = async () => {
         // Stop recording if active
@@ -23,7 +23,9 @@ export default function SOSScreen() {
             }
         }
         setIsRecording(false);
-        router.push('/home');
+        
+        // Navigate to Home tab
+        navigation.navigate('Home');
     };
 
     const saveVideoToGallery = async (videoUri: string) => {
@@ -117,7 +119,7 @@ export default function SOSScreen() {
                     <Text className="text-white font-bold">Grant Permission</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                    onPress={() => router.push('/home')}
+                    onPress={() => navigation.navigate('Home')}
                     className="bg-red-500 px-6 py-3 rounded-lg"
                 >
                     <Text className="text-white font-bold">Go Back</Text>
