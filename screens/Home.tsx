@@ -281,6 +281,13 @@ const HomeScreen = ({ route }: HomeScreenProps) => {
                 <Text className="text-gray-400 text-xs">{item.timeAgo}</Text>
               </View>
             ))}
+              {/* Plus Button */}
+              <TouchableOpacity
+                className="flex-row items-center justify-center bg-orange-500 py-3 rounded-xl mt-2"
+                onPress={() => navigation.navigate('Report', { mode: 'upload' })}
+              >
+                <Text className="text-white font-bold text-lg">＋ Upload Report</Text>
+              </TouchableOpacity>
           </ScrollView>
         </View>
       </Modalize>
