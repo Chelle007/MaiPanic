@@ -456,7 +456,7 @@ const StatusScreen = () => {
                         </TouchableOpacity>
                     </View>
 
-                    <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+                    <ScrollView className="" showsVerticalScrollIndicator={false}>
                         <View className="bg-gray-800 rounded-xl p-4 mb-4">
                             <View className="flex-row justify-between items-center">
                                 <Text className="text-gray-400 text-sm">Status</Text>
