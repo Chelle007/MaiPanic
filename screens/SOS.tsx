@@ -1,211 +1,181 @@
-import React, { useState, useEffect } from 'react';
-import { Text, View, TouchableOpacity, Alert, Dimensions, ImageBackground } from 'react-native';
-
-const { width, height } = Dimensions.get('window');
+import React, { useState, useRef } from 'react';
+import { Text, View, TouchableOpacity, Alert } from 'react-native';
+import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 
 export default function SOSScreen() {
-    const [isConnected, setIsConnected] = useState(false);
-    const [callDuration, setCallDuration] = useState(0);
     const [isRecording, setIsRecording] = useState(false);
+    const [facing, setFacing] = useState<CameraType>('back');
+    const [permission, requestPermission] = useCameraPermissions();
+    const cameraRef = useRef<CameraView>(null);
+    const router = useRouter();
 
-    useEffect(() => {
-        let interval;
-        if (isConnected) {
-            interval = setInterval(() => {
-                setCallDuration(prev => prev + 1);
-            }, 1000);
+    const handleEndCall = async () => {
+        // Stop recording if active
+        if (isRecording && cameraRef.current) {
+            try {
+                await cameraRef.current.stopRecording();
+            } catch (error) {
+                console.log('Error stopping recording:', error);
+            }
         }
-        return () => {
-            if (interval) clearInterval(interval);
-        };
-    }, [isConnected]);
-
-    const formatTime = (seconds) => {
-        const mins = Math.floor(seconds / 60);
-        const secs = seconds % 60;
-        return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-    };
-
-    const handleSOSPress = () => {
-        if (!isConnected) {
-            setIsConnected(true);
-            setIsRecording(true);
-            Alert.alert(
-                "Emergency Call Started",
-                "Connecting to Emergency Services...\nYour location is being shared.",
-                [{ text: "OK" }]
-            );
-        }
-    };
-
-    const handleEndCall = () => {
-        setIsConnected(false);
         setIsRecording(false);
-        setCallDuration(0);
-        Alert.alert(
-            "Call Ended",
-            "Emergency call has been terminated.",
-            [{ text: "OK" }]
-        );
+        router.push('/home');
     };
+
+    const toggleRecording = async () => {
+        if (!cameraRef.current) return;
+
+        try {
+            if (isRecording) {
+                // Stop recording
+                await cameraRef.current.stopRecording();
+                setIsRecording(false);
+            } else {
+                // Start recording
+                setIsRecording(true);
+                const result = await cameraRef.current.recordAsync({
+                    maxDuration: 600, // 10 minutes max
+                });
+                console.log('Recording saved to:', result?.uri);
+                // Here you would typically upload to emergency services
+                setIsRecording(false);
+            }
+        } catch (error) {
+            console.log('Recording error:', error);
+            setIsRecording(false);
+            Alert.alert('Recording Error', 'Unable to start/stop recording');
+        }
+    };
+
+    const flipCamera = () => {
+        setFacing(current => (current === 'back' ? 'front' : 'back'));
+    };
+
+    // Handle permission states
+    if (!permission) {
+        // Camera permissions are still loading
+        return (
+            <View className="flex-1 bg-black justify-center items-center">
+                <Text className="text-white text-lg">Loading camera...</Text>
+            </View>
+        );
+    }
+
+    if (!permission.granted) {
+        // Camera permissions are not granted yet
+        return (
+            <View className="flex-1 bg-black justify-center items-center px-4">
+                <Ionicons name="camera-off" size={80} color="gray" />
+                <Text className="text-white text-lg mt-4 text-center">
+                    Camera Permission Required
+                </Text>
+                <Text className="text-gray-400 text-sm mt-2 text-center mb-6">
+                    This app needs camera access to function properly in emergency situations.
+                </Text>
+                <TouchableOpacity
+                    onPress={requestPermission}
+                    className="bg-blue-500 px-6 py-3 rounded-lg mb-4"
+                >
+                    <Text className="text-white font-bold">Grant Permission</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => router.push('/home')}
+                    className="bg-red-500 px-6 py-3 rounded-lg"
+                >
+                    <Text className="text-white font-bold">Go Back</Text>
+                </TouchableOpacity>
+            </View>
+        );
+    }
 
     return (
         <View className="flex-1 bg-black">
-            {/* Mock Camera Background - simulating back camera view */}
-            <View className="flex-1 bg-gradient-to-b from-gray-800 to-gray-900">
-                {/* Simulated camera feed background */}
-                <View className="flex-1 bg-gray-700 relative">
-                    
-                    {/* Status Bar */}
-                    <View className="absolute top-12 left-0 right-0 z-10 flex-row justify-between items-center px-4">
-                        <View className="bg-red-600 px-3 py-1 rounded-full flex-row items-center">
-                            <View className={`w-2 h-2 bg-white rounded-full mr-2 ${isRecording ? 'opacity-100' : 'opacity-50'}`} />
-                            <Text className="text-white font-semibold text-sm">LIVE</Text>
+            {/* Camera View */}
+            <CameraView
+                ref={cameraRef}
+                style={{ flex: 1 }}
+                facing={facing}
+                mode="video"
+                videoQuality="720p"
+            >
+                {/* Header with Live Indicator */}
+                <View className="absolute top-12 left-0 right-0 z-10">
+                    <View className="bg-gray-800/80 mx-4 rounded-lg p-3">
+                        <View className="flex-row items-center justify-center mb-2">
+                            <View className="w-3 h-3 bg-red-500 rounded-full mr-2" />
+                            <Text className="text-white text-xl font-bold">LIVE</Text>
                         </View>
-                        {isConnected && (
-                            <View className="bg-black bg-opacity-50 px-3 py-1 rounded-full">
-                                <Text className="text-white font-mono">{formatTime(callDuration)}</Text>
-                            </View>
-                        )}
+                        <Text className="text-white text-center text-sm">
+                            This video will be streamed, recorded, and{'\n'}
+                            shared with Emergency Services, your Trusted{'\n'}
+                            Contacts, and nearby users
+                        </Text>
                     </View>
+                </View>
 
-                    {/* Info Banner */}
-                    <View className="absolute top-20 left-4 right-4 z-10 mt-8">
-                        <View className="bg-black bg-opacity-70 p-4 rounded-lg">
-                            <Text className="text-white text-center text-sm">
-                                This video will be streamed, recorded, and{'\n'}
-                                shared with <Text className="font-semibold">Emergency Services</Text>, <Text className="font-semibold">your Trusted{'\n'}
-                                Contacts</Text>, and <Text className="font-semibold">nearby users</Text>
+                {/* Police Officer Placeholder */}
+                <View className="absolute top-56 left-6 z-10">
+                    <View className="w-24 h-32 bg-gray-800/90 rounded-lg overflow-hidden border-2 border-gray-600">
+                        <View className="flex-1 justify-center items-center">
+                            <Ionicons name="person" size={40} color="white" />
+                            <Text className="text-white text-xs mt-2 text-center">
+                                Officer{'\n'}Connected
                             </Text>
                         </View>
                     </View>
-
-                    {/* Mock Camera Feed Content */}
-                    <View className="flex-1 justify-center items-center">
-                        <Text className="text-gray-400 text-lg">📹 Camera View</Text>
-                        <Text className="text-gray-500 text-sm mt-2">Back Camera Feed</Text>
-                    </View>
-
-                    {/* Police Officer Placeholder - Top Left */}
-                    <View className="absolute top-32 left-4 mt-20">
-                        <View className="w-20 h-28 bg-gray-800 bg-opacity-90 rounded-lg overflow-hidden border-2 border-blue-500">
-                            <View className="flex-1 justify-center items-center p-2">
-                                <View className="w-12 h-12 bg-blue-600 rounded-full justify-center items-center mb-1">
-                                    <Text className="text-white text-lg">👮‍♂️</Text>
-                                </View>
-                                <Text className="text-white text-xs text-center font-semibold">Officer{'\n'}Martinez</Text>
-                                {isConnected && (
-                                    <View className="absolute top-1 right-1">
-                                        <View className="w-2 h-2 bg-green-400 rounded-full" />
-                                    </View>
-                                )}
-                            </View>
-                        </View>
-                    </View>
-
-                    {/* Recording Indicator */}
-                    {isRecording && (
-                        <View className="absolute top-32 right-4 mt-20">
-                            <View className="bg-red-600 px-3 py-1 rounded-full flex-row items-center">
-                                <View className="w-2 h-2 bg-white rounded-full mr-1" />
-                                <Text className="text-white text-xs font-semibold">REC</Text>
-                            </View>
-                        </View>
-                    )}
-
-                    {/* Connection Status */}
-                    {isConnected && (
-                        <View className="absolute bottom-32 left-4 right-4 mb-20">
-                            <View className="bg-green-600 bg-opacity-90 p-3 rounded-lg border border-green-400">
-                                <Text className="text-white text-center font-semibold text-base">
-                                    🔗 Connected to Emergency Services
-                                </Text>
-                                <Text className="text-white text-center text-sm mt-1 opacity-90">
-                                    Help is on the way • Location shared • Recording active
-                                </Text>
-                            </View>
-                        </View>
-                    )}
-
-                    {/* Not Connected State */}
-                    {!isConnected && (
-                        <View className="absolute bottom-32 left-4 right-4 mb-20">
-                            <View className="bg-yellow-600 bg-opacity-80 p-3 rounded-lg border border-yellow-400">
-                                <Text className="text-white text-center font-semibold">
-                                    ⚠️ Press SOS to connect to Emergency Services
-                                </Text>
-                            </View>
-                        </View>
-                    )}
                 </View>
-            </View>
 
-            {/* Bottom Controls */}
-            <View className="absolute bottom-8 left-0 right-0">
-                <View className="flex-row justify-center items-center px-8">
-                    {/* Home Button */}
-                    <TouchableOpacity 
-                        className="w-12 h-12 justify-center items-center mx-3"
-                        onPress={() => Alert.alert("Home", "Navigate to home screen")}
-                    >
-                        <View className="w-10 h-10 bg-gray-600 bg-opacity-70 rounded-full justify-center items-center">
-                            <Text className="text-white text-lg">🏠</Text>
-                        </View>
-                    </TouchableOpacity>
-
-                    {/* Share Button */}
-                    <TouchableOpacity 
-                        className="w-12 h-12 justify-center items-center mx-3"
-                        onPress={() => Alert.alert("Share", "Share emergency details")}
-                    >
-                        <View className="w-10 h-10 bg-gray-600 bg-opacity-70 rounded-full justify-center items-center">
-                            <Text className="text-white text-lg">📋</Text>
-                        </View>
-                    </TouchableOpacity>
-
-                    {/* SOS Button */}
+                {/* Camera Controls */}
+                <View className="absolute top-56 right-6 z-10">
                     <TouchableOpacity
-                        onPress={handleSOSPress}
-                        className={`w-20 h-20 rounded-full justify-center items-center mx-4 ${
-                            isConnected ? 'bg-green-600 border-2 border-green-400' : 'bg-red-600 border-2 border-red-400'
-                        }`}
-                        disabled={isConnected}
+                        onPress={flipCamera}
+                        className="w-12 h-12 bg-gray-800/80 rounded-full justify-center items-center mb-3"
+                        activeOpacity={0.8}
                     >
-                        <Text className="text-white font-bold text-lg">
-                            {isConnected ? '✓' : 'SOS'}
-                        </Text>
+                        <Ionicons name="camera-reverse" size={24} color="white" />
                     </TouchableOpacity>
+                    
+                    <TouchableOpacity
+                        onPress={toggleRecording}
+                        className={`w-12 h-12 rounded-full justify-center items-center ${
+                            isRecording ? 'bg-red-500' : 'bg-gray-800/80'
+                        }`}
+                        activeOpacity={0.8}
+                    >
+                        <Ionicons 
+                            name={isRecording ? "stop" : "videocam"} 
+                            size={24} 
+                            color="white" 
+                        />
+                    </TouchableOpacity>
+                </View>
 
-                    {/* End Call / Profile Button */}
-                    {isConnected ? (
+                {/* Bottom Controls */}
+                <View className="absolute bottom-0 left-0 right-0 pb-12">
+                    <View className="flex-row justify-center items-center">
+                        {/* End Call Button */}
                         <TouchableOpacity
                             onPress={handleEndCall}
-                            className="w-12 h-12 bg-red-600 rounded-full justify-center items-center mx-3 border-2 border-red-400"
+                            className="w-16 h-16 bg-red-500 rounded-full justify-center items-center"
+                            activeOpacity={0.8}
                         >
-                            <Text className="text-white text-lg">📞</Text>
+                            <Ionicons name="call" size={32} color="white" style={{ transform: [{ rotate: '135deg' }] }} />
                         </TouchableOpacity>
-                    ) : (
-                        <TouchableOpacity 
-                            className="w-12 h-12 justify-center items-center mx-3"
-                            onPress={() => Alert.alert("Profile", "Open user profile")}
-                        >
-                            <View className="w-10 h-10 bg-gray-600 bg-opacity-70 rounded-full justify-center items-center">
-                                <Text className="text-white text-lg">👤</Text>
-                            </View>
-                        </TouchableOpacity>
-                    )}
-
-                    {/* Settings Button */}
-                    <TouchableOpacity 
-                        className="w-12 h-12 justify-center items-center mx-3"
-                        onPress={() => Alert.alert("Settings", "Open settings menu")}
-                    >
-                        <View className="w-10 h-10 bg-gray-600 bg-opacity-70 rounded-full justify-center items-center">
-                            <Text className="text-white text-lg">⚙️</Text>
-                        </View>
-                    </TouchableOpacity>
+                    </View>
                 </View>
-            </View>
+
+                {/* Recording Indicator */}
+                {isRecording && (
+                    <View className="absolute top-20 right-4 z-10">
+                        <View className="flex-row items-center bg-red-500 px-3 py-1 rounded-full">
+                            <View className="w-2 h-2 bg-white rounded-full mr-2" />
+                            <Text className="text-white text-sm font-bold">REC</Text>
+                        </View>
+                    </View>
+                )}
+            </CameraView>
         </View>
     );
 }
