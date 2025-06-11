@@ -59,7 +59,7 @@ function MainTabNavigator() {
           // Capture the navigation object in ref
           tabNavigationRef.current = navigation;
           return (
-            <View className="flex-row h-20 bg-gray-900 border-t border-gray-700 px-4 justify-between items-center">
+            <View className="flex-row h-28 bg-gray-900 border-t border-gray-700 px-4 pb-4 justify-between items-center">
               {state.routes
                 .filter(route => route.name !== 'Report') // Filter out the hidden Report screen
                 .map((route, index) => {
@@ -91,7 +91,7 @@ function MainTabNavigator() {
                       break;
                     case 'SOS':
                       icon = (
-                        <View className="bg-red-600 w-16 h-16 rounded-full justify-center items-center shadow-lg -mt-8">
+                        <View className="bg-red-600 w-20 h-20 rounded-full justify-center items-center shadow-lg -mt-16">
                           <Text className="text-white font-bold text-lg">SOS</Text>
                         </View>
                       );
