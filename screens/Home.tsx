@@ -12,8 +12,9 @@ import MapView, { Marker, Region } from 'react-native-maps';
 import type { MapView as MapViewType } from 'react-native-maps';
 import { Modalize } from 'react-native-modalize';
 import { useNavigation } from '@react-navigation/native';
-import { CheckCircle } from 'lucide-react-native';
+import { CheckCircle, MoveLeft } from 'lucide-react-native';
 import type { NavigationProp } from '@react-navigation/native';
+import { Directions } from 'react-native-gesture-handler';
 
 // Define your navigation stack type
 type RootStackParamList = {
@@ -243,11 +244,11 @@ const HomeScreen = ({ route }: HomeScreenProps) => {
           borderTopRightRadius: 20,
         }}
         handleStyle={{ backgroundColor: '#9CA3AF' }}
-        alwaysOpen={130}
+        alwaysOpen={150}
       >
         <View className="px-6 pt-4">
           {/* Bomb Shelter & Recents Buttons */}
-          <View className="flex-row justify-center gap-x-20 mb-4">
+          <View className="flex-row justify-between px-14 mb-4">
             <TouchableOpacity
               className="items-center"
               onPress={() => navigation.navigate('BombShelters')}
@@ -259,10 +260,10 @@ const HomeScreen = ({ route }: HomeScreenProps) => {
               <Text className="text-white text-xs mt-1">Bomb Shelters</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity className="items-center">
+            <TouchableOpacity className="items-center" style={{marginRight: 20}}>
               <Image
                 source={require('../assets/recentsLogo.png')}
-                style={{ width: 40, height: 40 }}
+                style={{ width: 40, height: 40, resizeMode: 'contain' }}
               />
               <Text className="text-white text-xs mt-1">Recents</Text>
             </TouchableOpacity>
