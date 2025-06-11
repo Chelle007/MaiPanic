@@ -1,9 +1,73 @@
-import { Text, View } from 'react-native';
+import React, { useState, useMemo } from 'react';
+import { View, Text, TextInput, Image, ScrollView, TouchableOpacity, Linking } from 'react-native';
+import { Home, Video, Bell, User } from 'lucide-react-native';
 
-export default function CirclesScreen() {
-    return (
-        <View className="flex-1 justify-center items-center bg-white">
-            <Text className="text-lg font-bold text-blue-500">🔄 Circles Page</Text>
-        </View>
+const videoData = [
+  { title: "Fire Escape: Exit Routes", duration: "02:01", videoId: "TciQ1iOKBkA" },
+  { title: "CPR & First Aid Basics", duration: "04:41", videoId: "2PngCv7NjaI" },
+  { title: "Flood Safety & Evacuation", duration: "03:19", videoId: "WFpn6Z0a0uc" },
+  { title: "Building Emergency Kit", duration: "01:17", videoId: "x_--5fuM1Dc" },
+  { title: "Stop, Drop & Roll Technique", duration: "02:16", videoId: "KPfT2O358pE" },
+  { title: "Heimlich Maneuver Guide", duration: "04:10", videoId: "ZVYOEMP5sKo" },
+  { title: "Wild Fires and Smoke", duration: "02:39", videoId: "vzUSV2RlZ98" },
+  { title: "Burns: What to Do", duration: "03:53", videoId: "JwlSXhSg69A" },
+];
+
+export default function VideoPage() {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredVideos = useMemo(() => {
+    return videoData.filter(video =>
+      video.title.toLowerCase().includes(searchQuery.toLowerCase())
     );
+  }, [searchQuery]);
+
+  return (
+    <View className="flex-1 bg-black px-4 pt-12">
+      {/* Search Bar */}
+      <TextInput
+        className="bg-white rounded-xl p-3 mb-4 text-base"
+        placeholder="Search video"
+        placeholderTextColor="#666"
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+      />
+
+      {/* Video Grid */}
+      <ScrollView>
+        <View className="flex-row flex-wrap justify-between">
+          {filteredVideos.map((video, index) => (
+            <TouchableOpacity
+              key={index}
+              className="w-[48%] bg-slate-800 rounded-xl mb-4 overflow-hidden"
+              onPress={() => Linking.openURL(`https://www.youtube.com/watch?v=${video.videoId}`)}
+            >
+              <Image
+                source={{ uri: `https://img.youtube.com/vi/${video.videoId}/hqdefault.jpg` }}
+                className="h-28 w-full"
+              />
+              <View className="p-2">
+                <Text className="text-white font-bold text-xs">{video.title}</Text>
+                <Text className="text-gray-300 text-[10px] mt-1">{video.duration}</Text>
+              </View>
+            </TouchableOpacity>
+          ))}
+
+          {/* Fallback if no results */}
+          {filteredVideos.length === 0 && searchQuery.trim() !== '' && (
+            <View className="w-full items-center mt-10">
+              <Text className="text-white mb-2">No results found.</Text>
+              <TouchableOpacity
+                className="bg-blue-500 px-4 py-2 rounded-lg"
+                onPress={() => Linking.openURL(`https://www.youtube.com/results?search_query=${encodeURIComponent(searchQuery)}`)}
+              >
+                <Text className="text-white font-semibold">Search on YouTube</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+      </ScrollView>
+
+    </View>
+  );
 }
