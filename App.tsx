@@ -4,6 +4,11 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { AlertTriangle, Copy, Home, Settings, Users } from 'lucide-react-native';
 import { View } from 'react-native';
 
+//this is for the homepage bottom sheet.
+//need to make sure gestureHandlerRootHOC wraps your root app
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import 'react-native-reanimated';
+
 import CirclesScreen from './screens/Circles';
 import HomeScreen from './screens/Home';
 import SettingsScreen from './screens/Settings';
@@ -16,7 +21,7 @@ import './global.css';
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-// 👇 Define the tab navigator as a function/component
+//Define the tab navigator as a function/component
 const TabNavigator = () => (
   <Tab.Navigator
     screenOptions={({ route }) => ({
@@ -57,11 +62,13 @@ const TabNavigator = () => (
 // ✅ Final App function — stack wraps tabs
 export default function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="MainTabs" component={TabNavigator} />
-        <Stack.Screen name="BombShelters" component={BombSheltersScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="MainTabs" component={TabNavigator} />
+          <Stack.Screen name="BombShelters" component={BombSheltersScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </GestureHandlerRootView>
   );
 }
