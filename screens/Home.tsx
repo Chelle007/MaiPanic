@@ -243,7 +243,7 @@ const HomeScreen = ({ route }: HomeScreenProps) => {
           borderTopRightRadius: 20,
         }}
         handleStyle={{ backgroundColor: '#9CA3AF' }}
-        alwaysOpen={150}
+        alwaysOpen={130}
       >
         <View className="px-6 pt-4">
           {/* Bomb Shelter & Recents Buttons */}
